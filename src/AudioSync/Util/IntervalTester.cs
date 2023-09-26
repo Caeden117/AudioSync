@@ -1,10 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using AudioSync.Structures;
 
-namespace AudioSync.Util
+namespace AudioSync.Util;
+
+internal sealed class IntervalTester
 {
-    internal class IntervalTester
-    {
-    }
+    public readonly int MinInterval;
+    public readonly int MaxInterval;
+    public readonly int NumIntervals;
+
+    private List<Onset> onsets;
+
 }

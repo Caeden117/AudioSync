@@ -26,17 +26,10 @@ public sealed class SyncAnalyser
 
     public List<SyncResult> Run(float[] audioData, int channels, int sampleRate, int blockSize = 2048, int hopSize = 256)
     {
-        var monoSamples = audioData.Length / channels;
-        
-        // For some reason using var wants to imply a SyncResult*, which is unsafe
-        Span<SyncResult> resultSpan = stackalloc SyncResult[monoSamples];
-        Run(ref resultSpan, audioData, channels, sampleRate, blockSize, hopSize);
+        var results = new List<SyncResult>();
 
-        return new(resultSpan.ToArray());
-    }
 
-    public void Run(ref Span<SyncResult> results, float[] audioData, int channels, int sampleRate, int blockSize = 2048, int hopSize = 256)
-    {
 
+        return results;
     }
 }
