@@ -15,5 +15,28 @@ public sealed class SyncAnalyser
     private readonly double minimumBPM;
     private readonly double maximumBPM;
 
+    public SyncAnalyser(double minimumBPM, double maximumBPM)
+    {
+        this.minimumBPM = minimumBPM;
+        this.maximumBPM = maximumBPM;
+    }
 
+    public Task<List<SyncResult>> RunAsync(float[] audioData, int channels, int sampleRate, int blockSize = 2048, int hopSize = 256)
+        => Task.Run(() => Run(audioData, channels, sampleRate, blockSize, hopSize));
+
+    public List<SyncResult> Run(float[] audioData, int channels, int sampleRate, int blockSize = 2048, int hopSize = 256)
+    {
+        var monoSamples = audioData.Length / channels;
+        
+        // For some reason using var wants to imply a SyncResult*, which is unsafe
+        Span<SyncResult> resultSpan = stackalloc SyncResult[monoSamples];
+        Run(ref resultSpan, audioData, channels, sampleRate, blockSize, hopSize);
+
+        return new(resultSpan.ToArray());
+    }
+
+    public void Run(ref Span<SyncResult> results, float[] audioData, int channels, int sampleRate, int blockSize = 2048, int hopSize = 256)
+    {
+
+    }
 }

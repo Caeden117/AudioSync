@@ -7,4 +7,15 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <!--
+  MathNet.Numerics is not a real-time friendly library, and comes with a whole lot of baggage that AudioSync does not use.
+  
+  It may be wise to consider re-writing the specific parts of MathNet.Numerics that AudioSync uses, and make it Span<T> accelerated.
+  But, that is a daunting task, given the amount of dependent MathNet code that would be needing to rewrite.
+  So instead, it makes more sense to continue with MathNet.
+  -->
+  <ItemGroup>
+    <PackageReference Include="MathNet.Numerics" Version="5.0.0" />
+  </ItemGroup>
+
 </Project>
