@@ -1,3 +1,3 @@
 ﻿namespace AudioSync.Structures;
 
-internal record Onset(int Position, float Strength);
+internal readonly record struct Onset(int Position, float Strength);

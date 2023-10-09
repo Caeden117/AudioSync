@@ -13,17 +13,4 @@
 /// <param name="Offset">
 /// Given the <paramref name="BPM"/>, this estimates the song offset in seconds.
 /// </param>
-// TODO(Caeden): Confirm Offset unit. Seconds or milliseconds?
-public readonly struct SyncResult
-{
-    public readonly float Fitness;
-    public readonly float BPM;
-    public readonly float Offset;
-
-    public SyncResult(float fitness, float bpm, float offset)
-    {
-        Fitness = fitness;
-        BPM = bpm;
-        Offset = offset;
-    }
-}
+public readonly record struct SyncResult(float Fitness, float BPM, float Offset);
