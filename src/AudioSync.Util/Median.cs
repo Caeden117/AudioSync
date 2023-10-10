@@ -1,6 +1,6 @@
 ﻿namespace AudioSync.Util;
 
-public static partial class Util
+public static partial class Utils
 {
     /*
      * This is an entirely different algorithm from Aubio, so I am unsure if this gives completely correct results compared to Aubio.
