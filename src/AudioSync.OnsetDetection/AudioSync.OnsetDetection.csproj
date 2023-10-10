@@ -7,4 +7,8 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\AudioSync.Util\AudioSync.Util.csproj" />
+  </ItemGroup>
+
 </Project>
