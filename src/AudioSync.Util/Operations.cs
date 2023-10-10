@@ -30,7 +30,6 @@ public static partial class Utils
     /// <remarks>
     /// The first element of <paramref name="span"/> will be pushed out and lost.
     /// </remarks>
-    // Is this safe?? Need to test.
     public static void Push(ref Span<double> span, double element)
     {
         Debug.Assert(!span.IsEmpty, $"{nameof(span)} cannot be empty.");

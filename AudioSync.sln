@@ -16,6 +16,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AudioSync.OnsetDetection", 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AudioSync.Util", "src\AudioSync.Util\AudioSync.Util.csproj", "{81903F82-A005-4E0D-AC99-F2C48FD595A5}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AudioSync.Tests", "src\AudioSync.Tests\AudioSync.Tests.csproj", "{D1589B74-3FD6-4DC3-9229-B1C3CFE433CE}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -34,6 +36,10 @@ Global
 		{81903F82-A005-4E0D-AC99-F2C48FD595A5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{81903F82-A005-4E0D-AC99-F2C48FD595A5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{81903F82-A005-4E0D-AC99-F2C48FD595A5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D1589B74-3FD6-4DC3-9229-B1C3CFE433CE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D1589B74-3FD6-4DC3-9229-B1C3CFE433CE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D1589B74-3FD6-4DC3-9229-B1C3CFE433CE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D1589B74-3FD6-4DC3-9229-B1C3CFE433CE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
