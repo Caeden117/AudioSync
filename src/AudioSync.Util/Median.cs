@@ -1,4 +1,6 @@
-﻿namespace AudioSync.Util;
+﻿using System.Diagnostics;
+
+namespace AudioSync.Util;
 
 public static partial class Utils
 {
@@ -15,17 +17,21 @@ public static partial class Utils
     /// </remarks>
     public static double Median(ref Span<double> span)
     {
+        Debug.Assert(span.Length > 0, $"{nameof(span)} must have items to take the median of.");
+
         QuickSort(ref span);
 
         var halfIdx = span.Length / 2;
 
-        return (span.Length % 0 == 1)
+        return (span.Length % 2 == 1)
             ? span[halfIdx]
             : (span[halfIdx] + span[halfIdx + 1]) / 2;
     }
 
     private static void QuickSort(ref Span<double> span)
     {
+        if (span.Length < 2) return;
+
         var q = Partition(ref span);
 
         var leftHalf = span[..q++];
