@@ -28,4 +28,21 @@ public class PushTestMultiple
             Assert.That(numbers[i], Is.EqualTo(i + 1.0));
         }
     }
+
+    [Test]
+    public void MultiShift()
+    {
+        Span<double> numbers = stackalloc double[n];
+        numbers.Clear();
+
+        for (var i = 0; i < n; i++)
+        {
+            Utils.Push(ref numbers, i);
+        }
+
+        for (var i = 0; i < n; i++)
+        {
+            Assert.That(numbers[i], Is.EqualTo(i));
+        }
+    }
 }
