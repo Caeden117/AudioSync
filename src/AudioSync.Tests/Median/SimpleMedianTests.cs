@@ -2,7 +2,7 @@
 
 namespace AudioSync.Tests.Median;
 
-public class MedianTests
+public class SimpleMedianTests
 {
     [Test]
     public void SimpleMedian()

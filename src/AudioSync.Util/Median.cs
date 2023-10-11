@@ -25,7 +25,7 @@ public static partial class Utils
 
         return (span.Length % 2 == 1)
             ? span[halfIdx]
-            : (span[halfIdx] + span[halfIdx + 1]) / 2;
+            : (span[halfIdx - 1] + span[halfIdx]) / 2;
     }
 
     private static void QuickSort(ref Span<double> span)
@@ -36,6 +36,7 @@ public static partial class Utils
 
         var leftHalf = span[..q++];
         QuickSort(ref leftHalf);
+
         if (q < span.Length - 1)
         {
             var rightHalf = span[q..];
