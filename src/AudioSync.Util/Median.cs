@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using System.Numerics;
 
 namespace AudioSync.Util;
 
@@ -38,6 +39,20 @@ public static partial class Utils
     }
 
 #if NET7_0_OR_GREATER
+    /// <summary>
+    /// Returns the median number in <paramref name="span"/>.
+    /// </summary>
+    /// <remarks>
+    /// This method stack allocates a copy of <paramref name="span"/> to perform work, so the original <paramref name="span"/> is not modified.
+    /// </remarks>
+    public static T SafeMedian<T>(in Span<double> span) where T : unmanaged, INumber<T>, IDivisionOperators<T, int, T>
+    {
+        Span<double> work = stackalloc T[span.Length];
+        span.CopyTo(work);
+
+        return Median(ref work);
+    }
+
     /// <summary>
     /// Returns the median number in <paramref name="span"/>.
     /// </summary>
