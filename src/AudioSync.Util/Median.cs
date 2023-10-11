@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using System.Numerics;
 
 namespace AudioSync.Util;
 
@@ -28,7 +29,34 @@ public static partial class Utils
             : (span[halfIdx - 1] + span[halfIdx]) / 2;
     }
 
-    private static void QuickSort(ref Span<double> span)
+#if NET7_0_OR_GREATER
+    /// <summary>
+    /// Returns the median number in <paramref name="span"/>.
+    /// </summary>
+    /// <remarks>
+    /// This method manipulates and sorts the source <paramref name="span"/>.
+    /// </remarks>
+    public static T Median<T>(ref Span<T> span) where T : INumber<T>, IDivisionOperators<T, int, T>
+    {
+        Debug.Assert(span.Length > 0, $"{nameof(span)} must have items to take the median of.");
+
+        QuickSort(ref span);
+
+        var halfIdx = span.Length / 2;
+
+        return (span.Length % 2 == 1)
+            ? span[halfIdx]
+            : (span[halfIdx - 1] + span[halfIdx]) / 2;
+    }
+#endif
+
+    /*
+     * I did some basic benchmarking between various methods of finding median: MathNET.Numerics, Nth Order Statistics, and the method
+     * that seemed to be the fastest... sort and pick median.
+     * 
+     * .NET doesn't seem to have sort methods for Spans, so here's a quick implementation of Quick Sort (haha) for Span
+     */
+    private static void QuickSort<T>(ref Span<T> span) where T : IComparable<T>
     {
         if (span.Length < 2) return;
 
@@ -44,7 +72,7 @@ public static partial class Utils
         }
     }
 
-    private static int Partition(ref Span<double> span)
+    private static int Partition<T>(ref Span<T> span) where T : IComparable<T>
     {
         ref var pivot = ref span[^1];
         var i = -1;
