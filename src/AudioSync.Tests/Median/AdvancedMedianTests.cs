@@ -34,4 +34,14 @@ public class AdvancedMedianTests
     
         Assert.That(calculated, Is.EqualTo(expected));
     }
+
+    [Test]
+    public void SafeMedian()
+    {
+        var span = numbers.AsSpan();
+
+        var calculated = Utils.SafeMedian(in span);
+
+        Assert.That(calculated, Is.EqualTo(expected));
+    }
 }

@@ -1,14 +1,22 @@
 ﻿using System.Diagnostics;
-using System.Numerics;
 
 namespace AudioSync.Util;
 
 public static partial class Utils
 {
-    /*
-     * This is an entirely different algorithm from Aubio, so I am unsure if this gives completely correct results compared to Aubio.
-     * Will have to test on a direct C# reimplementation.
-     */
+    /// <summary>
+    /// Returns the median number in <paramref name="span"/>.
+    /// </summary>
+    /// <remarks>
+    /// This method stack allocates a copy of <paramref name="span"/> to perform work, so the original <paramref name="span"/> is not modified.
+    /// </remarks>
+    public static double SafeMedian(in Span<double> span)
+    {
+        Span<double> work = stackalloc double[span.Length];
+        span.CopyTo(work);
+
+        return Median(ref work);
+    }
 
     /// <summary>
     /// Returns the median number in <paramref name="span"/>.
