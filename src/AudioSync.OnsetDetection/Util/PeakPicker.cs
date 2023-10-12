@@ -26,11 +26,11 @@ internal sealed class PeakPicker
         biquadFilter = new(0.15998789, 0.31997577, 0.15998789, 0.23484048, 0);
     }
 
-    public void Do(in Span<double> onset, ref double lastOnset)
+    public void Do(in double onset, ref double lastOnset)
     {
         // Push first onset into our window
         Span<double> windowSpan = window.AsSpan();
-        Utils.Push(ref windowSpan, onset[0]);
+        Utils.Push(ref windowSpan, onset);
 
         // Stackalloc a copy of our window to perform work with
         Span<double> modifiedSpan = stackalloc double[windowSpan.Length];

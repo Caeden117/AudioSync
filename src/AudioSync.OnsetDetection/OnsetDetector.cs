@@ -38,7 +38,7 @@ public sealed class OnsetDetector
         set => peakPicker.Threshold = value;
     }
 
-    public double Descriptor => spectralOutput[0];
+    public double Descriptor => spectralOutput;
 
     public double ThresholdedDescriptor => peakPicker.Thresholded;
 
@@ -62,11 +62,11 @@ public sealed class OnsetDetector
 
     // TODO: Convert to stackalloc in Do method
     private readonly Polar[] phaseVocoderOutput;
-    private readonly double[] spectralOutput;
 
     private readonly int sampleRate;
     private readonly int hopSize;
 
+    private double spectralOutput;
     private int totalFrames;
     private int lastOnset;
     private bool applyCompression;
@@ -83,7 +83,7 @@ public sealed class OnsetDetector
         adaptiveWhitening = new(bufferSize, hopSize, sampleRate);
 
         phaseVocoderOutput = new Polar[bufferSize];
-        spectralOutput = new double[1];
+        spectralOutput = 0.0;
 
         // Default values (before we re-initialize based on onset type)
         Threshold = 0.3;
@@ -145,12 +145,10 @@ public sealed class OnsetDetector
         }
 
         // Execute Spectral Description
-        // TODO: WE ONLY USE ONE ELEMENT!! Convert SpectralDescription to directly return the value we want
-        var spectralSpan = spectralOutput.AsSpan();
-        spectralDescription.Do(in fftGrain, ref spectralSpan);
+        spectralDescription.Do(in fftGrain, ref spectralOutput);
 
         // Execute Peak Picker
-        peakPicker.Do(in spectralSpan, ref onset);
+        peakPicker.Do(in spectralOutput, ref onset);
 
         totalFrames += hopSize;
         

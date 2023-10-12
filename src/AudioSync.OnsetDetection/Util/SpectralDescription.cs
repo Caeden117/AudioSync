@@ -43,19 +43,19 @@ internal sealed class SpectralDescription
         };
     }
 
-    public void Do(in Span<Polar> fftGrain, ref Span<double> onset) => method?.Invoke(in fftGrain, ref onset);
+    public void Do(in Span<Polar> fftGrain, ref double onset) => method?.Invoke(in fftGrain, ref onset);
 
-    private void HighFrequencyContent(in Span<Polar> fftGrain, ref Span<double> onset)
+    private void HighFrequencyContent(in Span<Polar> fftGrain, ref double onset)
     {
-        onset[0] = default;
+        onset = default;
 
         for (var i = 0; i < fftGrain.Length; i++)
         {
-            onset[0] += (i + 1) * fftGrain[i].Norm;
+            onset += (i + 1) * fftGrain[i].Norm;
         }
     }
 
-    private void ComplexDomain(in Span<Polar> fftGrain, ref Span<double> onset)
+    private void ComplexDomain(in Span<Polar> fftGrain, ref double onset)
     {
         if (oldMagnitude == null) throw new ArgumentNullException(nameof(oldMagnitude));
         if (currentMeasureVector == null) throw new ArgumentNullException(nameof(currentMeasureVector));
@@ -63,7 +63,7 @@ internal sealed class SpectralDescription
         if (secondLastFrameVector == null) throw new ArgumentNullException(nameof(secondLastFrameVector));
 
         var bins = fftGrain.Length;
-        onset[0] = default;
+        onset = default;
 
         for (var i = 0; i < bins; i++)
         {
@@ -78,7 +78,7 @@ internal sealed class SpectralDescription
             euclideanDistance -= 2 * oldMag * grain.Norm * Math.Cos(currentMeasureVector[i] - grain.Phase);
             euclideanDistance = Math.Abs(euclideanDistance);
             euclideanDistance = Math.Sqrt(euclideanDistance);
-            onset[0] += euclideanDistance;
+            onset += euclideanDistance;
 
             // Push back frames
             secondLastFrameVector[i] = lastFrameVector[i];
@@ -89,29 +89,29 @@ internal sealed class SpectralDescription
         }
     }
 
-    private void KullbackLiebler(in Span<Polar> fftGrain, ref Span<double> onset)
+    private void KullbackLiebler(in Span<Polar> fftGrain, ref double onset)
     {
         if (oldMagnitude == null) throw new ArgumentNullException(nameof(oldMagnitude));
 
-        onset[0] = default;
+        onset = default;
 
         for (var i = 0; i < fftGrain.Length; i++)
         {
             ref var grain = ref fftGrain[i];
             ref var mag = ref oldMagnitude[i];
 
-            onset[0] += grain.Norm * Math.Log(1 + (grain.Norm / (mag + 1e-1)));
+            onset += grain.Norm * Math.Log(1 + (grain.Norm / (mag + 1e-1)));
             mag = grain.Norm;
         }
 
-        if (double.IsNaN(onset[0])) onset[0] = default;
+        if (double.IsNaN(onset)) onset = default;
     }
 
-    private void SpectralFlux(in Span<Polar> fftGrain, ref Span<double> onset)
+    private void SpectralFlux(in Span<Polar> fftGrain, ref double onset)
     {
         if (oldMagnitude == null) throw new ArgumentNullException(nameof(oldMagnitude));
 
-        onset[0] = default;
+        onset = default;
 
         for (var i = 0; i < fftGrain.Length; i++)
         {
@@ -120,7 +120,7 @@ internal sealed class SpectralDescription
 
             if (grain.Norm > mag)
             {
-                onset[0] += grain.Norm - mag;
+                onset += grain.Norm - mag;
             }
 
             mag = grain.Norm;
@@ -128,5 +128,5 @@ internal sealed class SpectralDescription
     }
 
 
-    private delegate void SpectralFunction(in Span<Polar> fftGrain, ref Span<double> onset);
+    private delegate void SpectralFunction(in Span<Polar> fftGrain, ref double onset);
 }
