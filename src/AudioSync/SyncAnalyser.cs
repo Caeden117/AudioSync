@@ -1,7 +1,6 @@
 ﻿using AudioSync.OnsetDetection;
 using AudioSync.OnsetDetection.Structures;
 using AudioSync.Structures;
-using System.Collections.Generic;
 
 namespace AudioSync;
 
@@ -31,27 +30,26 @@ public sealed class SyncAnalyser
 
     public List<SyncResult> Run(double[] monoAudioData, int sampleRate, int blockSize = 2048, int hopSize = 256)
     {
-        var results = new List<SyncResult>();
-
         // From mattmora's testing, Complex Domain with 0.1 threshold seems to give best results
         var onsetDetection = new OnsetDetector(OnsetType.ComplexDomain, blockSize, hopSize, sampleRate)
         {
             Threshold = 0.1f
         };
 
+        Span<double> monoSpan = monoAudioData.AsSpan();
         Span<double> hopData = stackalloc double[hopSize];
         var samples = monoAudioData.Length;
         var onsetOutput = 0.0;
         var detectedOnsets = new List<Onset>();
 
         // Find offsets in audio
-        for (var i = 0; i < samples; i++)
+        for (var i = 0; i + hopSize < samples; i += hopSize)
         {
-            hopData[i % hopSize] = monoAudioData[i];
+            // We copy blocks of hop data at a time to save iterations 
+            monoSpan.Slice(i, hopSize).CopyTo(hopData);
 
-            // Wait until we've filled up our hop data
-            if (i % hopSize < hopSize - 1) continue;
-
+            // Perform onset detection in hopes to find an onset
+            // TODO: Move onset output from ref value to method output
             onsetDetection.Do(in hopData, ref onsetOutput);
 
             // If we do not find an onset, do not bother
@@ -77,6 +75,6 @@ public sealed class SyncAnalyser
 
         // TODO: Calculate offsets
 
-        return results;
+        return null;
     }
 }
