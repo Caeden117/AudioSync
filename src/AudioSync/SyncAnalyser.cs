@@ -1,6 +1,7 @@
 ﻿using AudioSync.OnsetDetection;
 using AudioSync.OnsetDetection.Structures;
 using AudioSync.Structures;
+using System.Collections.Generic;
 
 namespace AudioSync;
 
@@ -48,31 +49,28 @@ public sealed class SyncAnalyser
         {
             hopData[i % hopSize] = monoAudioData[i];
 
+            // Wait until we've filled up our hop data
             if (i % hopSize < hopSize - 1) continue;
 
             onsetDetection.Do(in hopData, ref onsetOutput);
 
+            // If we do not find an onset, do not bother
             if (onsetOutput < 1) continue;
 
-            detectedOnsets.Add(new(onsetDetection.LastOffset, 0f));
-        }
+            // Calculate strength of newly detected onset by taking the average of samples around the onset position
+            var position = onsetDetection.LastOffset;
 
-        // Calculate onset strength
-        // TODO: This can be combined into the loop above, saving iterations and re-creating Onset objects
-        for (var i = 0; i < detectedOnsets.Count; i++)
-        {
-            var onset = detectedOnsets[i];
-            var windowMin = Math.Max(0, onset.Position - (STRENGTH_WINDOW_SIZE / 2));
-            var windowMax = Math.Min(monoAudioData.Length, onset.Position + (STRENGTH_WINDOW_SIZE / 2));
-            
-            var volume = 0.0;
+            var windowMin = Math.Max(0, position - (STRENGTH_WINDOW_SIZE / 2));
+            var windowMax = Math.Min(monoAudioData.Length, position + (STRENGTH_WINDOW_SIZE / 2));
+
+            var strength = 0.0;
             for (var j = windowMin; j < windowMax; j++)
             {
-                volume += Math.Abs(monoAudioData[j]);
+                strength += Math.Abs(monoAudioData[j]);
             }
-            volume /= Math.Max(1, windowMax - windowMin);
+            strength /= Math.Max(1, windowMax - windowMin);
 
-            detectedOnsets[i] = onset with { Strength = volume };
+            detectedOnsets.Add(new(onsetDetection.LastOffset, strength));
         }
 
         // TODO: Calculate BPM
