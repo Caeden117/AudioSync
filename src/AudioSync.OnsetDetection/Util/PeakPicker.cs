@@ -26,7 +26,7 @@ internal sealed class PeakPicker
         biquadFilter = new(0.15998789, 0.31997577, 0.15998789, 0.23484048, 0);
     }
 
-    public void Do(in Span<double> onset, ref Span<double> output)
+    public void Do(in Span<double> onset, ref double lastOnset)
     {
         // Push first onset into our window
         Span<double> windowSpan = window.AsSpan();
@@ -58,10 +58,10 @@ internal sealed class PeakPicker
         var peekSpan = onsetPeek.AsSpan();
         Utils.Push(ref peekSpan, Thresholded);
 
-        // Push peak onto first output element if we detect one
+        // Update last onset if we detect one
         if (Utils.PeakPick(in peekSpan, 1))
         {
-            output[0] = Utils.QuadraticPeakPos(in peekSpan, 1);
+            lastOnset = Utils.QuadraticPeakPos(in peekSpan, 1);
         }
     }
 }

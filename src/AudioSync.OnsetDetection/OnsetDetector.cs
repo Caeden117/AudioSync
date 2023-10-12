@@ -123,7 +123,7 @@ public sealed class OnsetDetector
         Reset();
     }
 
-    public void Do(in Span<double> input, ref Span<double> onsets)
+    public void Do(in Span<double> input, ref double onset)
     {
         // Execute phase vocoding on our input
         Span<Polar> fftGrain = phaseVocoderOutput.AsSpan();
@@ -150,54 +150,44 @@ public sealed class OnsetDetector
         spectralDescription.Do(in fftGrain, ref spectralSpan);
 
         // Execute Peak Picker
-        peakPicker.Do(in spectralSpan, ref onsets);
-        var isOnset = onsets[0];
+        peakPicker.Do(in spectralSpan, ref onset);
 
-        if (isOnset > 0)
+        totalFrames += hopSize;
+        
+        // Check if we have an onset
+        if (onset > 0)
         {
             // Silent onsets should not count as an onset
             if (Utils.IsSilence(in input, SilenceThreshold))
             {
-                isOnset = 0;
+                onset = 0;
+                return;
             }
-            // this is a detected onset
-            else
-            {
-                var newOnset = totalFrames + (int)Math.Round(isOnset * hopSize);
 
-                // Check if this onset far enough away
-                if (lastOnset + MinInterOnsetInterval < newOnset)
-                {
-                    // ...and also that it's not blocked by delay
-                    if (lastOnset > 0 && Delay > newOnset)
-                    {
-                        isOnset = 0.0;
-                    }
-                    else
-                    {
-                        lastOnset = Math.Max(Delay, newOnset);
-                    }
-                }
-                else
-                {
-                    isOnset = 0.0;
-                }
+            // Calculate new onset time
+            var newOnset = totalFrames + (int)Math.Round(onset * hopSize);
+
+            // Check if this onset far enough away and that it's not blocked by delay
+            if (lastOnset + MinInterOnsetInterval >= newOnset || (lastOnset > 0 && Delay > newOnset))
+            {
+                onset = 0.0;
+                return;
             }
+
+            lastOnset = Math.Max(Delay, newOnset);
+            return;
         }
+
         // Check if we are at the beginning of the file with no silence
         else if (totalFrames <= Delay && !Utils.IsSilence(in input, SilenceThreshold))
         {
             var newOnset = totalFrames;
-            if (totalFrames == 0 || lastOnset + MinInterOnsetInterval < newOnset)
+            if (totalFrames == 0 || onset + MinInterOnsetInterval < newOnset)
             {
-                isOnset = Delay / hopSize;
+                onset = Delay / hopSize;
                 lastOnset = totalFrames + Delay;
             }
         }
-
-        onsets[0] = isOnset;
-        totalFrames += hopSize;
-        return;
     }
 
     public void Reset()
