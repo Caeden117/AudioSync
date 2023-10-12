@@ -1,4 +1,8 @@
-﻿namespace AudioSync;
+﻿using AudioSync.OnsetDetection;
+using AudioSync.OnsetDetection.Structures;
+using AudioSync.Structures;
+
+namespace AudioSync;
 
 public sealed class SyncAnalyser
 {
@@ -21,14 +25,59 @@ public sealed class SyncAnalyser
         this.maximumBPM = maximumBPM;
     }
 
-    public Task<List<SyncResult>> RunAsync(float[] audioData, int channels, int sampleRate, int blockSize = 2048, int hopSize = 256)
-        => Task.Run(() => Run(audioData, channels, sampleRate, blockSize, hopSize));
+    public Task<List<SyncResult>> RunAsync(double[] monoAudioData, int sampleRate, int blockSize = 2048, int hopSize = 256)
+        => Task.Run(() => Run(monoAudioData, sampleRate, blockSize, hopSize));
 
-    public List<SyncResult> Run(float[] audioData, int channels, int sampleRate, int blockSize = 2048, int hopSize = 256)
+    public List<SyncResult> Run(double[] monoAudioData, int sampleRate, int blockSize = 2048, int hopSize = 256)
     {
         var results = new List<SyncResult>();
 
+        // From mattmora's testing, Complex Domain with 0.1 threshold seems to give best results
+        var onsetDetection = new OnsetDetector(OnsetType.ComplexDomain, blockSize, hopSize, sampleRate)
+        {
+            Threshold = 0.1f
+        };
 
+        Span<double> hopData = stackalloc double[hopSize];
+        var samples = monoAudioData.Length;
+        var onsetOutput = 0.0;
+        var detectedOnsets = new List<Onset>();
+
+        // Find offsets in audio
+        for (var i = 0; i < samples; i++)
+        {
+            hopData[i % hopSize] = monoAudioData[i];
+
+            if (i % hopSize < hopSize - 1) continue;
+
+            onsetDetection.Do(in hopData, ref onsetOutput);
+
+            if (onsetOutput < 1) continue;
+
+            detectedOnsets.Add(new(onsetDetection.LastOffset, 0f));
+        }
+
+        // Calculate onset strength
+        // TODO: This can be combined into the loop above, saving iterations and re-creating Onset objects
+        for (var i = 0; i < detectedOnsets.Count; i++)
+        {
+            var onset = detectedOnsets[i];
+            var windowMin = Math.Max(0, onset.Position - (STRENGTH_WINDOW_SIZE / 2));
+            var windowMax = Math.Min(monoAudioData.Length, onset.Position + (STRENGTH_WINDOW_SIZE / 2));
+            
+            var volume = 0.0;
+            for (var j = windowMin; j < windowMax; j++)
+            {
+                volume += Math.Abs(monoAudioData[j]);
+            }
+            volume /= Math.Max(1, windowMax - windowMin);
+
+            detectedOnsets[i] = onset with { Strength = volume };
+        }
+
+        // TODO: Calculate BPM
+
+        // TODO: Calculate offsets
 
         return results;
     }
