@@ -60,11 +60,9 @@ public sealed class OnsetDetector
     private readonly PeakPicker peakPicker;
     private readonly AdaptiveWhitening adaptiveWhitening;
 
-    // TODO: Convert to stackalloc in Do method
-    private readonly Polar[] phaseVocoderOutput;
-
     private readonly int sampleRate;
     private readonly int hopSize;
+    private readonly int bufferSize;
 
     private double spectralOutput;
     private int totalFrames;
@@ -76,13 +74,12 @@ public sealed class OnsetDetector
     {
         this.sampleRate = sampleRate;
         this.hopSize = hopSize;
+        this.bufferSize = bufferSize;
 
         phaseVocoder = new(bufferSize, hopSize);
         peakPicker = new();
         spectralDescription = new(onsetType, bufferSize);
         adaptiveWhitening = new(bufferSize, hopSize, sampleRate);
-
-        phaseVocoderOutput = new Polar[bufferSize];
         spectralOutput = 0.0;
 
         // Default values (before we re-initialize based on onset type)
@@ -126,7 +123,7 @@ public sealed class OnsetDetector
     public void Do(in Span<double> input, ref double onset)
     {
         // Execute phase vocoding on our input
-        Span<Polar> fftGrain = phaseVocoderOutput.AsSpan();
+        Span<Polar> fftGrain = stackalloc Polar[bufferSize];
         phaseVocoder.Do(in input, ref fftGrain);
 
         // Apply whitening if enabled
