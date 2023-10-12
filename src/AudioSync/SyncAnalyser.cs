@@ -6,9 +6,6 @@ namespace AudioSync;
 
 public sealed class SyncAnalyser
 {
-    private const int INTERVAL_DELTA = 1;
-    private const int INTERVAL_DOWNSAMPLE = 5;
-
     // Size of window around onset sample used to calculate onset strength, can significantly affect results
     // 200 is from the original code, not sure where it comes from, but it seems to work well
     private const int STRENGTH_WINDOW_SIZE = 200;
