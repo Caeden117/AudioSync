@@ -28,9 +28,8 @@ internal sealed class PeakPicker
 
     public void Do(in Span<double> onset, ref Span<double> output)
     {
-        Span<double> windowSpan = window.AsSpan();
-
         // Push first onset into our window
+        Span<double> windowSpan = window.AsSpan();
         Utils.Push(ref windowSpan, onset[0]);
 
         // Stackalloc a copy of our window to perform work with
