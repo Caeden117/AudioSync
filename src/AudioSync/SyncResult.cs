@@ -13,4 +13,10 @@
 /// <param name="Offset">
 /// Given the <paramref name="BPM"/>, this estimates the song offset in seconds.
 /// </param>
-public readonly record struct SyncResult(float Fitness, float BPM, float Offset);
+public readonly record struct SyncResult(double Fitness, double BPM, double Offset)
+{
+    /// <summary>
+    /// Length of one beat, in seconds
+    /// </summary>
+    public double Beat => 60f / BPM;
+}

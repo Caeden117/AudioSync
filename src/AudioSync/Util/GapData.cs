@@ -6,18 +6,31 @@ namespace AudioSync.Util;
 // Gap confidence evaluation
 internal sealed class GapData
 {
+    public int Downsample
+    {
+        get => downsample;
+        set
+        {
+            downsample = value;
+            hammingWindow = CreateHammingWindow(2048 >> downsample);
+        }
+    }
+
     private readonly List<Onset> onsets;
     private readonly int[] wrappedPos;
     private readonly double[] wrappedOnsets;
-    private readonly double[] hammingWindow;
-    private readonly int downsample;
     private readonly int onsetCount;
+
+    private int downsample;
+    private double[] hammingWindow;
 
     public GapData(int bufferSize, int downsample, List<Onset> onsets)
     {
         this.onsets = onsets;
         onsetCount = onsets.Count;
 
+        // Technically should be removed by setting Downsample directly
+        // however C# gives a warning because hammingWindow isn't directly assigned.
         this.downsample = downsample;
         hammingWindow = CreateHammingWindow(2048 >> downsample);
 

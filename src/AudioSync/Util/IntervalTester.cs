@@ -14,12 +14,12 @@ internal sealed class IntervalTester
 
     private readonly double[] fitness;
 
-    public IntervalTester(int sampleRate, double minBPM, double maxBPM)
+    public IntervalTester(int sampleRate, int minInterval, int maxInterval)
     {
         this.sampleRate = sampleRate;
 
-        minInterval = (int)((sampleRate * 60 / maxBPM) + 0.5);
-        maxInterval = (int)((sampleRate * 60 / minBPM) + 0.5);
+        this.minInterval = minInterval;
+        this.maxInterval = maxInterval;
         numIntervals = maxInterval - minInterval;
 
         fitness = new double[numIntervals];
@@ -33,12 +33,8 @@ internal sealed class IntervalTester
     /// <summary>
     /// Calculates fitness values with coarse intervals
     /// </summary>
-    public void FillCoarseIntervals(GapData gapData)
+    public void FillCoarseIntervals(GapData gapData, int coarseIntervals, int intervalDelta)
     {
-        const int intervalDelta = SyncAnalyser.INTERVAL_DELTA;
-        
-        var coarseIntervals = (numIntervals + intervalDelta - 1) / intervalDelta;
-
         Parallel.For(0, coarseIntervals, i =>
         {
             var idx = i * intervalDelta;
