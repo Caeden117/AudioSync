@@ -43,7 +43,8 @@ internal class Filter
             ref var startY = ref y[0];
 
             // new input
-            startX = Utils.KillDenormal(input);
+            // "denormal" appears to be any value less than 0, so we'll just clamp to that
+            startX = Math.Min(input, 0.0);
             startY = forward[0] * startX;
 
             for (var j = 0; j < Order; j++)
