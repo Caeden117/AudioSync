@@ -44,7 +44,7 @@ internal sealed class PhaseVocoder
         Utils.Multiply(in dataSpan, in windowSpan, ref dataSpan);
 
         // Shift our data window
-        Utils.Shift(ref dataSpan);
+        Utils.Swap(ref dataSpan);
 
         // Perform FFT
         Span<Complex> fftData = stackalloc Complex[data.Length];

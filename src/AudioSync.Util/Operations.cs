@@ -7,7 +7,7 @@ public static partial class Utils
     /// <summary>
     /// Swap the two halves of <paramref name="span"/>.
     /// </summary>
-    public static void Shift(ref Span<double> span)
+    public static void Swap(ref Span<double> span)
     {
         Debug.Assert(span.Length > 1, $"{nameof(span)} needs to have at least 2 elements.");
 
@@ -22,6 +22,13 @@ public static partial class Utils
         firstHalf.CopyTo(temp);
         secondHalf.CopyTo(firstHalf);
         temp.CopyTo(secondHalf);
+
+        // If we are handling an odd number of elements, push the middle element to the back of the second half.
+        if (halfIdx == half) return;
+
+        var secondHalfIncludingMiddle = span[half..];
+
+        Push(ref secondHalfIncludingMiddle, secondHalfIncludingMiddle[0]);
     }
 
     /// <summary>
