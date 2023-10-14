@@ -1,10 +1,11 @@
-﻿using AudioSync.Util;
+﻿using System.Diagnostics.CodeAnalysis;
 
-namespace AudioSync.Tests.Push;
+namespace AudioSync.Util.Tests.Push;
 
 public class PushTestSimple
 {
     [Test]
+    [SuppressMessage("Assertion", "NUnit2045:Use Assert.Multiple", Justification = "Span cannot be accessed in a lambda")]
     public void Push()
     {
         Span<double> numbers = stackalloc double[] { 0, 1, 2 };

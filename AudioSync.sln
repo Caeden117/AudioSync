@@ -14,9 +14,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AudioSync.OnsetDetection", "src\AudioSync.OnsetDetection\AudioSync.OnsetDetection.csproj", "{9AEBF5FB-721A-41EC-BE11-2F788CC74747}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AudioSync.Util", "src\AudioSync.Util\AudioSync.Util.csproj", "{81903F82-A005-4E0D-AC99-F2C48FD595A5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AudioSync.Util", "src\AudioSync.Util\AudioSync.Util.csproj", "{81903F82-A005-4E0D-AC99-F2C48FD595A5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AudioSync.Tests", "src\AudioSync.Tests\AudioSync.Tests.csproj", "{D1589B74-3FD6-4DC3-9229-B1C3CFE433CE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AudioSync.Util.Tests", "src\AudioSync.Util.Tests\AudioSync.Util.Tests.csproj", "{D1589B74-3FD6-4DC3-9229-B1C3CFE433CE}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

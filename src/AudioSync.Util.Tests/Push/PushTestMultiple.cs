@@ -1,6 +1,4 @@
-﻿using AudioSync.Util;
-
-namespace AudioSync.Tests.Push;
+﻿namespace AudioSync.Util.Tests.Push;
 
 [TestFixture(10)]
 [TestFixture(100)]

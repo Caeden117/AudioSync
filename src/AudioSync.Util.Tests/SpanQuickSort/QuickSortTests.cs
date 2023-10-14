@@ -1,6 +1,4 @@
-﻿using AudioSync.Util;
-
-namespace AudioSync.Tests.SpanQuickSort;
+﻿namespace AudioSync.Util.Tests.SpanQuickSort;
 
 [TestFixture(new double[] { 3, 2, 1 })]
 [TestFixture(new double[] { 1, 3, 3, 6, 7, 8, 9 })]

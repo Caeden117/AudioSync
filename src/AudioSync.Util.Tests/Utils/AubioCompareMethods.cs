@@ -1,4 +1,4 @@
-﻿namespace AudioSync.Tests;
+﻿namespace AudioSync.Util.Tests;
 
 /// <summary>
 /// This class contains C# re-implementations of certain Aubio methods in order to test the results of AudioSync rewritten alternatives.

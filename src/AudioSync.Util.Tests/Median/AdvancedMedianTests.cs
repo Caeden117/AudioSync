@@ -1,6 +1,6 @@
 ﻿using AudioSync.Util;
 
-namespace AudioSync.Tests.Median;
+namespace AudioSync.Util.Tests.Median;
 
 /*
  * These are various median examples found online.

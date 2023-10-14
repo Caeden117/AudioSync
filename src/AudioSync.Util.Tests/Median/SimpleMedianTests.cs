@@ -1,6 +1,4 @@
-﻿using AudioSync.Util;
-
-namespace AudioSync.Tests.Median;
+﻿namespace AudioSync.Util.Tests.Median;
 
 public class SimpleMedianTests
 {
