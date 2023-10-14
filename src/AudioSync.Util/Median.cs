@@ -33,6 +33,8 @@ public static partial class Utils
 
         var halfIdx = span.Length / 2;
 
+        // REVIEW: Aubio implementation, in the case of even numbered collections, seems to return the middle-left element, not the average.
+        //   Compare our BPM detection results to see if we need to make the same decision.
         return (span.Length % 2 == 1)
             ? span[halfIdx]
             : (span[halfIdx - 1] + span[halfIdx]) / 2;

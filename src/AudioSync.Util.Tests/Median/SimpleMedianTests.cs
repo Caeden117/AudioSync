@@ -23,4 +23,23 @@ public class SimpleMedianTests
 
         Assert.That(ourResult, Is.EqualTo(aubioResult));
     }
+
+    [Test]
+    public void ThrowsOnEmpty()
+    {
+        try
+        {
+            var arr = Array.Empty<double>();
+            var span = arr.AsSpan();
+
+            var result = Utils.Median(ref span);
+        }
+        catch
+        {
+            Assert.Pass("Debug assertion was hit.");
+            return;
+        }
+
+        Assert.Fail("No debug assertion was hit.");
+    }
 }
