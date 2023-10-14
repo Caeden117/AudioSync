@@ -16,4 +16,35 @@ public class PushTestSimple
         Assert.That(numbers[1], Is.EqualTo(2.0));
         Assert.That(numbers[2], Is.EqualTo(3.0));
     }
+
+    [Test]
+    public void PushSingle()
+    {
+        var arr = new double[1] { 0 };
+
+        var span = arr.AsSpan();
+
+        Utils.Push(ref span, 1);
+
+        Assert.That(arr[0], Is.EqualTo(1));
+    }
+
+    [Test]
+    public void ThrowsOnEmpty()
+    {
+        try
+        {
+            var arr = Array.Empty<double>();
+            var span = arr.AsSpan();
+
+            Utils.Push(ref span, 2.0);
+        }
+        catch
+        {
+            Assert.Pass("Debug assertion was hit.");
+            return;
+        }
+
+        Assert.Fail("No debug assertion was hit.");
+    }
 }
