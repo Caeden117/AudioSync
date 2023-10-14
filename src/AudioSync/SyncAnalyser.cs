@@ -44,10 +44,10 @@ public sealed class SyncAnalyser
         var onsetOutput = 0.0;
         var detectedOnsets = new List<Onset>();
 
-        // Find offsets in audio
+        // Find onsets
         for (var i = 0; i + hopSize < samples; i += hopSize)
         {
-            // We copy blocks of hop data at a time to save iterations 
+            // We copy blocks at a time to save iterations 
             monoSpan.Slice(i, hopSize).CopyTo(hopData);
 
             // Perform onset detection in hopes to find an onset
@@ -57,9 +57,10 @@ public sealed class SyncAnalyser
             // If we do not find an onset, do not bother
             if (onsetOutput < 1) continue;
 
-            // Calculate strength of newly detected onset by taking the average of samples around the onset position
+            // Sample position of our detected onset
             var position = onsetDetection.LastOffset;
 
+            // Calculate strength of newly detected onset by taking the average of samples around the onset position
             var windowMin = Math.Max(0, position - (STRENGTH_WINDOW_SIZE / 2));
             var windowMax = Math.Min(monoAudioData.Length, position + (STRENGTH_WINDOW_SIZE / 2));
 
@@ -109,6 +110,9 @@ public sealed class SyncAnalyser
         var fitness = intervalTester.Fitness;
 
         // Approximate a fitness curve using a cubic polynomial fit
+        // How I wish I have these be stack allocated, but alas I would need to re-write the Polynomial portion of MathNET.Numerics
+        //   to support Span<T> methods.
+        // REVIEW: Move these to ArrayPool instead?
         var polyX = new double[coarseIntervals];
         var polyY = new double[coarseIntervals];
 
@@ -131,7 +135,7 @@ public sealed class SyncAnalyser
             maxFitness = Math.Max(maxFitness, fitness[i]);
         }
 
-        // Refine results around our best intervals
+        // Create initial results around our best intervals
         var fitnessThreshold = maxFitness * 0.4;
         for (var i = 0; i < numIntervals; i += INTERVAL_DELTA)
         {
@@ -155,7 +159,7 @@ public sealed class SyncAnalyser
         RoundBPMValues(gapData, results, poly, sampleRate, 0.1, 1);
         RemoveDuplicates(results, 0.1);
 
-        // More general rounding, gives more generous results. Remove exact duplicates from the rounding process
+        // More general rounding, gives more generous results, followed by another de-duplication.
         RoundBPMValues(gapData, results, poly, sampleRate, 0.3, ROUNDING_THRESHOLD);
         RemoveDuplicates(results, 0.0);
 
@@ -163,6 +167,9 @@ public sealed class SyncAnalyser
         results.Sort((a, b) => a.Fitness.CompareTo(b.Fitness));
 
         // If we have very close results, we perform one last confidence pass as a second check.
+        // REVIEW: On average, it may be faster to always re-calculate fitness and sort.
+        //   Thereby always needing only one sort, but at the cost of an iteration to re-calculate fitness.
+        //   is this trade-off worth it?
         if (results.Count >= 2 && results[0].Fitness / results[1].Fitness < 1.05)
         {
             // Re-calculate confidence/fitness
@@ -190,16 +197,21 @@ public sealed class SyncAnalyser
         {
             var result = results[i];
 
+            // Calculate the difference between our BPM and a theoretical rounded BPM
             var roundedBPM = Math.Round(result.BPM);
             var diff = Math.Abs(roundedBPM - result.BPM);
 
+            // Ignore this result if the difference proves too much to bother
             if (diff > range) continue;
 
+            // Calculate and compare the differences between our current BPM and our rounded BPM
             var oldConfidence = gapData.GetConfidenceForBPM(sampleRate, result.BPM, polyFit);
             var newConfidence = gapData.GetConfidenceForBPM(sampleRate, roundedBPM, polyFit);
 
+            // Ignore this result if the difference proves too much to bother
             if (newConfidence < oldConfidence * threshold) continue;
 
+            // If our rounded BPM gives better confidence, update the current result.
             results[i] = result with
             {
                 BPM = roundedBPM,
@@ -231,6 +243,7 @@ public sealed class SyncAnalyser
                 // This just takes the minimum difference between normal/half/doubled BPM and the BPM we are checking
                 var minDifference = Math.Min(Math.Min(bpmDifference, halfBPMDifference), doubledBPMDifference);
 
+                // If difference is too much, this other BPM is likely not a duplicate
                 if (minDifference > precision) continue;
 
                 // Remove duplicate BPM
@@ -271,7 +284,10 @@ public sealed class SyncAnalyser
     {
         var sampleCount = monoSamples.Length;
 
-        // Create a slope representation of the waveform.
+        // Calculate the slopes of all our mono samples.
+        // REVIEW: Stackallocing with the entire length of mono samples will almost assuredly overflow the stack.
+        //   However, I don't want to allocate garbage with every invocation.
+        //   Should I switch to ArrayPool?
         Span<double> slopes = stackalloc double[sampleCount];
         ComputeSlopes(monoSamples, ref slopes, sampleCount, sampleRate);
 
@@ -287,10 +303,14 @@ public sealed class SyncAnalyser
         var posB = offbeat * sampleRate;
         var sumA = 0.0;
         var sumB = 0.0;
-        for (; posA < end && posB < end; posA += interval, posB += interval)
+
+        while (posA < sampleCount && posB < sampleCount)
         {
             sumA += slopes[(int)posA];
             sumB += slopes[(int)posB];
+
+            posA += interval;
+            posB += interval;
         }
 
         // Return the offset with the highest support.
@@ -314,15 +334,17 @@ public sealed class SyncAnalyser
 
         // Slide window over the samples.
         var scalar = 1.0 / wh;
-        for (int i = wh, end = numFrames - wh; i < end; ++i)
+        for (int i = wh; i < numFrames - wh; i++)
         {
             // Determine slope value.
             output[i] = Math.Max(0.0, (sumR - sumL) * scalar);
 
-            // Move window.
+            // Slide window over.
             var cur = Math.Abs(samples[i]);
+            
             sumL -= Math.Abs(samples[i - wh]);
             sumL += cur;
+
             sumR -= cur;
             sumR += Math.Abs(samples[i + wh]);
         }
