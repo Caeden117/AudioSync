@@ -31,6 +31,7 @@ public class SwapTests
         }
     }
 
+    // Test by calculating the IDX of numbers post-swap, and ensuring numbers are in their correct post-swap position.
     [Test]
     public void Test()
     {
@@ -50,5 +51,23 @@ public class SwapTests
 
             Assert.That(numbers[i], Is.EqualTo(copySpan[swappedIdx]));
         }
+    }
+
+    // Test by performing Swap twice, which should put numbers back into their original position.
+    [Test]
+    public void TestSwapSwap()
+    {
+        var span = numbers.AsSpan();
+
+        // Set up a copy of our data for evaluation
+        double[] copyArr = new double[numbers.Length];
+        Array.Copy(numbers, copyArr, numbers.Length);
+
+        // Swap twice. This should retain the original order.
+        Utils.Swap(ref span);
+        Utils.Swap(ref span);
+
+        // Confirm that our post-swap array is equivalent to the pre-swap copy.
+        Assert.That(numbers, Is.EquivalentTo(copyArr));
     }
 }

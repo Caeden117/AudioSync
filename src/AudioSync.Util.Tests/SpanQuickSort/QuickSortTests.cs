@@ -9,6 +9,7 @@
 [TestFixture(new double[] { 31, 28, 19, 14, 11, 30, 27, 20 })]
 [TestFixture(new double[] { 4, 5, 8, 12, 15, 17, 18 })]
 [TestFixture(new double[] { 23, 26, 26, 26, 29, 36, 39, 40, 42, 42, 48, 49 })]
+// Manual test fixures with numbers that I typed as fast as I could.
 public class QuickSortTests
 {
     private readonly double[] numbers;
