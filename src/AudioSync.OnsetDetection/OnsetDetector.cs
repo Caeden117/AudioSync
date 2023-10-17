@@ -2,7 +2,6 @@
 using AudioSync.OnsetDetection.Util;
 using AudioSync.Util;
 using AudioSync.Util.Structures;
-using System.Diagnostics;
 
 namespace AudioSync.OnsetDetection;
 
@@ -47,7 +46,7 @@ public sealed class OnsetDetector
         get => applyCompression ? lambdaCompression : 0.0;
         set
         {
-            Debug.Assert(value >= 0, "Compression must be greater than or equal to 0.");
+            if (value < 0.0) throw new ArgumentOutOfRangeException("Compression must be greater than or equal to 0.");
             lambdaCompression = value;
             applyCompression = lambdaCompression > 0.0;
         }

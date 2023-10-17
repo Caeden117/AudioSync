@@ -1,6 +1,4 @@
-﻿using System.Diagnostics;
-
-namespace AudioSync.Util;
+﻿namespace AudioSync.Util;
 
 public static partial class Utils
 {
@@ -9,8 +7,7 @@ public static partial class Utils
     /// </summary>
     public static bool PeakPick(in Span<double> onset, int position)
     {
-        Debug.Assert(position > 0, $"{nameof(position)} may not be the first item in the sequence.");
-        Debug.Assert(position < onset.Length - 1, $"{nameof(position)} may not be the last item in the sequence.");
+        if (position <= 0 || position >= onset.Length - 1) throw new ArgumentOutOfRangeException(nameof(position));
 
         return onset[position] > onset[position - 1]
             && onset[position] > onset[position + 1]

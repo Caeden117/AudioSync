@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿using AudioSync.Util.Exceptions;
+using System.Diagnostics;
 using System.Numerics;
 
 namespace AudioSync.Util;
@@ -10,8 +11,8 @@ public static partial class Utils
     /// </summary>
     public static void Multiply(in Span<double> a, in Span<double> b, ref Span<double> result)
     {
-        Debug.Assert(a.Length == b.Length, $"Lengths of {nameof(a)} and {nameof(b)} are not equal.");
-        Debug.Assert(a.Length == result.Length, $"Length of {nameof(result)} expected to be {a.Length}.");
+        if (a.Length != b.Length) throw new AudioSyncFatalException($"Lengths of {nameof(a)} and {nameof(b)} are not equal.");
+        if (a.Length != result.Length) throw new AudioSyncFatalException($"Length of {nameof(result)} must match the length of the input parameters.");
 
         for (int i = 0; i < a.Length; i++)
         {
@@ -27,8 +28,8 @@ public static partial class Utils
     /// </remarks>
     public static void MultiplySIMD(in Span<double> a, in Span<double> b, ref Span<double> result)
     {
-        Debug.Assert(a.Length == b.Length, $"Lengths of {nameof(a)} and {nameof(b)} are not equal.");
-        Debug.Assert(a.Length == result.Length, $"Length of {nameof(result)} expected to be {a.Length}.");
+        if (a.Length != b.Length) throw new AudioSyncFatalException($"Lengths of {nameof(a)} and {nameof(b)} are not equal.");
+        if (a.Length != result.Length) throw new AudioSyncFatalException($"Length of {nameof(result)} must match the length of the input parameters.");
 
         // Variables we will use throughout the method
         var length = a.Length;

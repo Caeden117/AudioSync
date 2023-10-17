@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿using AudioSync.Util.Exceptions;
+using System.Diagnostics;
 using System.Numerics;
 
 namespace AudioSync.Util;
@@ -27,8 +28,8 @@ public static partial class Utils
     /// </remarks>
     public static double Median(ref Span<double> span)
     {
-        Debug.Assert(span.Length > 0, $"{nameof(span)} must have items to take the median of.");
-
+        if (span.Length <= 0) throw new AudioSyncFatalException($"{nameof(span)} must have items to take the median of.");
+        
         QuickSort(ref span);
 
         var halfIdx = span.Length / 2;

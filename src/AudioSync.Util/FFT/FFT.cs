@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿using AudioSync.Util.Exceptions;
+using System.Diagnostics;
 using System.Numerics;
 
 namespace AudioSync.Util.FFT;
@@ -31,7 +32,8 @@ public sealed class FFT
         lengthTotal = dataLength + zeroPaddingLength;
 
         var log2 = Math.Log(lengthTotal, 2);
-        Debug.Assert(log2 % 1 == 0, $"{nameof(dataLength)} and {nameof(zeroPaddingLength)} must equal a power of 2.");
+
+        if (log2 % 1 != 0) throw new AudioSyncFatalException($"{nameof(dataLength)} and {nameof(zeroPaddingLength)} must equal a power of 2.");
 
         // Set other parameters
         fftLog2 = (int)log2;
@@ -77,8 +79,8 @@ public sealed class FFT
 
     public void Execute(in Span<double> timeSeries, ref Span<Complex> allocatedOutput)
     {
-        Debug.Assert(timeSeries.Length >= lengthTotal, $"Length of {nameof(timeSeries)} is expected to be at least {lengthTotal}.");
-        Debug.Assert(allocatedOutput.Length >= lengthHalf, $"Length of {nameof(allocatedOutput)} expected to be at least {lengthHalf}.");
+        if (timeSeries.Length < lengthTotal) throw new AudioSyncFatalException($"Length of {nameof(timeSeries)} is expected to be at least {lengthTotal}.");
+        if (allocatedOutput.Length < lengthHalf) throw new AudioSyncFatalException($"Length of {nameof(allocatedOutput)} expected to be at least {lengthHalf}.");
 
         var butterflyCount = lengthTotal >> 1;
         var butterflyWidth = lengthTotal >> 1;

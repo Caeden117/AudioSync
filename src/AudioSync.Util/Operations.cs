@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿using AudioSync.Util.Exceptions;
+using System.Diagnostics;
 
 namespace AudioSync.Util;
 
@@ -9,7 +10,7 @@ public static partial class Utils
     /// </summary>
     public static void Swap(ref Span<double> span)
     {
-        Debug.Assert(span.Length > 1, $"{nameof(span)} needs to have at least 2 elements.");
+        if (span.Length <= 1) throw new AudioSyncFatalException($"{nameof(span)} needs to have at least 2 elements.");
 
         var half = span.Length / 2;
         var halfIdx = half + (span.Length % 2);
@@ -39,7 +40,7 @@ public static partial class Utils
     /// </remarks>
     public static void Push(ref Span<double> span, double element)
     {
-        Debug.Assert(!span.IsEmpty, $"{nameof(span)} cannot be empty.");
+        if (!span.IsEmpty) throw new AudioSyncFatalException($"{nameof(span)} cannot be empty.");
 
         if (span.Length == 1)
         {
