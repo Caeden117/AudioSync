@@ -1,6 +1,8 @@
 ﻿namespace AudioSync.Util.Tests.Swap;
 
 // Test with explicitly given array
+[TestFixture(new double[] { 1, 2 })]
+[TestFixture(new double[] { 1, 2, 3 })]
 [TestFixture(new double[] { 1, 2, 3, 4 })]
 [TestFixture(new double[] { 1, 2, 3, 4, 5 })]
 [TestFixture(new double[] { 55.1, 234.5, 123.1, 204.2, 1, 283, 99.1 })]
