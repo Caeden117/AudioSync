@@ -1,5 +1,4 @@
 ﻿using AudioSync.Util.Exceptions;
-using System.Diagnostics;
 
 namespace AudioSync.Util;
 
@@ -40,7 +39,7 @@ public static partial class Utils
     /// </remarks>
     public static void Push(ref Span<double> span, double element)
     {
-        if (!span.IsEmpty) throw new AudioSyncFatalException($"{nameof(span)} cannot be empty.");
+        if (span.IsEmpty) throw new AudioSyncFatalException($"{nameof(span)} cannot be empty.");
 
         if (span.Length == 1)
         {

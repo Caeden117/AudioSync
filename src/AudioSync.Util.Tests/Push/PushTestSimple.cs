@@ -1,4 +1,5 @@
-﻿using System.Diagnostics.CodeAnalysis;
+﻿using AudioSync.Util.Exceptions;
+using System.Diagnostics.CodeAnalysis;
 
 namespace AudioSync.Util.Tests.Push;
 
@@ -32,19 +33,12 @@ public class PushTestSimple
     [Test]
     public void ThrowsOnEmpty()
     {
-        try
+        Assert.Throws<AudioSyncFatalException>(() =>
         {
             var arr = Array.Empty<double>();
             var span = arr.AsSpan();
 
             Utils.Push(ref span, 2.0);
-        }
-        catch
-        {
-            Assert.Pass("Debug assertion was hit.");
-            return;
-        }
-
-        Assert.Fail("No debug assertion was hit.");
+        });
     }
 }

@@ -1,5 +1,4 @@
-﻿using AudioSync.Util;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 
 namespace AudioSync.OnsetDetection.Util;
 

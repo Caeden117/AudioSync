@@ -1,4 +1,5 @@
-﻿namespace AudioSync.Util.Tests.Median;
+﻿using AudioSync.Util.Exceptions;
+namespace AudioSync.Util.Tests.Median;
 
 public class SimpleMedianTests
 {
@@ -27,19 +28,12 @@ public class SimpleMedianTests
     [Test]
     public void ThrowsOnEmpty()
     {
-        try
+        Assert.Throws<AudioSyncFatalException>(() =>
         {
             var arr = Array.Empty<double>();
             var span = arr.AsSpan();
 
             var result = Utils.Median(ref span);
-        }
-        catch
-        {
-            Assert.Pass("Debug assertion was hit.");
-            return;
-        }
-
-        Assert.Fail("No debug assertion was hit.");
+        });
     }
 }
