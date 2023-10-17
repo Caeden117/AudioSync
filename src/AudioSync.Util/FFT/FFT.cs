@@ -3,6 +3,12 @@ using System.Numerics;
 
 namespace AudioSync.Util.FFT;
 
+/*
+ * This FFT implementation was based off of DSPLib by Steve Hageman, licensed under MIT.
+ * The implementation received a major refactor with style changes to match the AudioSync project, as well as some optimizations where I saw opportunity.
+ * Please see the bottom of this source file for license information.
+ */
+
 /// <summary>
 /// FFT class from DSPLib, accelerated with modern .NET techniques.
 /// </summary>
@@ -71,8 +77,8 @@ public sealed class FFT
 
     public void Execute(in Span<double> timeSeries, ref Span<Complex> allocatedOutput)
     {
-        Debug.Assert(timeSeries.Length <= lengthTotal, $"Length of {nameof(timeSeries)} is expected to be at least {lengthTotal}.");
-        Debug.Assert(allocatedOutput.Length <= lengthHalf, $"Length of {nameof(allocatedOutput)} expected to be at least {lengthHalf}.");
+        Debug.Assert(timeSeries.Length >= lengthTotal, $"Length of {nameof(timeSeries)} is expected to be at least {lengthTotal}.");
+        Debug.Assert(allocatedOutput.Length >= lengthHalf, $"Length of {nameof(allocatedOutput)} expected to be at least {lengthHalf}.");
 
         var butterflyCount = lengthTotal >> 1;
         var butterflyWidth = lengthTotal >> 1;
@@ -94,7 +100,7 @@ public sealed class FFT
             var multImaginary = angleIncSin[stage];
 
             // DSPLib does not state what this for-loop is for.
-            for (int start = 0; start < lengthTotal; start += spacing)
+            for (var start = 0; start < lengthTotal; start += spacing)
             {
                 var top = fftElements[start];
                 var bottom = fftElements[start + butterflyWidth];
@@ -105,7 +111,7 @@ public sealed class FFT
                 var imaginary = 0.0;
 
                 // Perform butterflies
-                for (int butterfly = 0; butterfly < butterflyCount; butterfly++)
+                for (var butterfly = 0; butterfly < butterflyCount; butterfly++)
                 {
                     if (top == null || bottom == null) break;
 
@@ -144,7 +150,7 @@ public sealed class FFT
         // The second half of our FFT is all in the imaginary space, so we only want to return the first half of data.
         // We use our precomputed reverse position to unscramble the first half of our data,
         //   while also copying values and multiplying by scale factors.
-        for (int i = 0; i < lengthTotal; i++)
+        for (var i = 0; i < lengthTotal; i++)
         {
             var element = fftElements[i];
             var target = element.ReversePosition;
@@ -181,3 +187,37 @@ public sealed class FFT
         public int ReversePosition;
     }
 }
+
+/**
+ * Performs an in-place complex FFT.
+ *
+ * Released under the MIT License
+ *
+ * Core FFT class based on,
+ *      Fast C# FFT - Copyright (c) 2010 Gerald T. Beauregard
+ *
+ * Changes to: Interface, scaling, zero padding, return values.
+ * Change to .NET Complex output types and integrated with my DSP Library.
+ * Note: Complex Number Type requires .NET >= 4.0
+ *
+ * These changes as noted above Copyright (c) 2016 Steven C. Hageman
+ *
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to
+ * deal in the Software without restriction, including without limitation the
+ * rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
+ * sell copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
+ * IN THE SOFTWARE.
+ */
