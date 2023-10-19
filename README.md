@@ -61,7 +61,7 @@ var results = await SyncAnalysis.RunAsync(monoSamples, sampleRate);
 ## TODO
 
 - Add overload for `float[]` parameters (seems Unity and NAudio all use `float[]` for storing samples)
-- Optimize run-time
+- Optimize (current execution time seems to be ~6.5s on my machine)
 - Build out tests to cover `AudioSync.OnsetDetection` and `AudioSync` projects
 - Publish to NuGet
 

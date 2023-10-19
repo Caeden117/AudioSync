@@ -2,7 +2,7 @@
 
 namespace AudioSync.OnsetDetection.Util;
 
-internal class Filter
+internal abstract class Filter
 {
     public int Order { get; init; }
 
@@ -27,13 +27,7 @@ internal class Filter
         feedback[0] = forward[0] = 1.0;
     }
 
-    public void Do(in Span<double> input, ref Span<double> output)
-    {
-        input.CopyTo(output);
-        Do(ref output);
-    }
-
-    public void Do(ref Span<double> span)
+    public void ForwardFilter(ref Span<double> span)
     {
         for (var i = 0; i < span.Length; i++)
         {
@@ -70,12 +64,12 @@ internal class Filter
     public void DoubleFilter(ref Span<double> input)
     {
         // First filter, reversing our input afterwards in preparation for the second filter
-        Do(ref input);
+        ForwardFilter(ref input);
         Reset();
         input.Reverse();
 
         // Second filter, reversing our input afterwards to return our span back to its original order.
-        Do(ref input);
+        ForwardFilter(ref input);
         Reset();
         input.Reverse();
     }

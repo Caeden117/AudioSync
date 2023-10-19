@@ -34,7 +34,7 @@ internal sealed class PhaseVocoder
             : 0;
     }
 
-    public void Do(in Span<double> dataNew, ref Span<Polar> allocatedOutput)
+    public void Process(in Span<double> dataNew, ref Span<Polar> allocatedOutput)
     {
         // Slide new data
         SwapBuffers(in dataNew);

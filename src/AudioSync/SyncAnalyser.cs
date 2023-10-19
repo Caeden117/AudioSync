@@ -8,7 +8,7 @@ namespace AudioSync;
 
 public sealed class SyncAnalyser
 {
-    internal const int INTERVAL_DELTA = 1;
+    private const int INTERVAL_DELTA = 1;
     private const int INTERVAL_DOWNSAMPLE = 5;
 
     // Size of window around onset sample used to calculate onset strength, can significantly affect results
@@ -52,7 +52,7 @@ public sealed class SyncAnalyser
 
             // Perform onset detection in hopes to find an onset
             // TODO: Move onset output from ref value to method output
-            onsetDetection.Do(in hopData, ref onsetOutput);
+            onsetDetection.DetectOnsets(in hopData, ref onsetOutput);
 
             // If we do not find an onset, do not bother
             if (onsetOutput < 1) continue;

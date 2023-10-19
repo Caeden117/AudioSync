@@ -1,5 +1,6 @@
 ﻿using AudioSync.OnsetDetection.Structures;
 using AudioSync.OnsetDetection.Util;
+using AudioSync.OnsetDetection.Util.SpectralDescription;
 using AudioSync.Util;
 using AudioSync.Util.Structures;
 
@@ -23,10 +24,6 @@ public sealed class OnsetDetector
 
     public int LastOffset => lastOnset - Delay;
 
-    public double LastSeconds => LastOffset / (double)sampleRate;
-
-    public double LastMilliseconds => LastSeconds * 1000;
-
     public double SilenceThreshold { get; set; }
 
     public int Delay { get; set; }
@@ -36,10 +33,6 @@ public sealed class OnsetDetector
         get => peakPicker.Threshold;
         set => peakPicker.Threshold = value;
     }
-
-    public double Descriptor => spectralOutput;
-
-    public double ThresholdedDescriptor => peakPicker.Thresholded;
 
     public double Compression
     {
@@ -55,7 +48,7 @@ public sealed class OnsetDetector
     public bool ApplyWhitening { get; set; }
 
     private readonly PhaseVocoder phaseVocoder;
-    private readonly SpectralDescription spectralDescription;
+    private readonly BaseSpectralDescription spectralDescription;
     private readonly PeakPicker peakPicker;
     private readonly AdaptiveWhitening adaptiveWhitening;
 
@@ -81,7 +74,6 @@ public sealed class OnsetDetector
 
         phaseVocoder = new(bufferSize, realSize, hopSize);
         peakPicker = new();
-        spectralDescription = new(onsetType, bufferSize);
         adaptiveWhitening = new(bufferSize, hopSize, sampleRate);
         spectralOutput = 0.0;
 
@@ -99,17 +91,20 @@ public sealed class OnsetDetector
             case OnsetType.HighFrequencyContent:
                 Threshold = 0.058;
                 Compression = 1;
+                spectralDescription = new HighFrequencyContent();
                 break;
             case OnsetType.ComplexDomain:
                 Delay = (int)(4.6 * hopSize);
                 Threshold = 0.15;
                 ApplyWhitening = true;
                 Compression = 1;
+                spectralDescription = new ComplexDomain(realSize);
                 break;
             case OnsetType.KullbackLiebler:
                 Threshold = 0.35;
                 ApplyWhitening = true;
                 Compression = 0.02;
+                spectralDescription = new KullbackLiebler(realSize);
                 break;
             case OnsetType.SpectralFlux:
                 Threshold = 0.18;
@@ -117,17 +112,20 @@ public sealed class OnsetDetector
                 adaptiveWhitening.RelaxTime = 100;
                 adaptiveWhitening.Floor = 1;
                 Compression = 10;
+                spectralDescription = new SpectralFlux(realSize);
                 break;
+            default:
+                throw new ArgumentOutOfRangeException(nameof(onsetType));
         }
 
         Reset();
     }
 
-    public void Do(in Span<double> input, ref double onset)
+    public void DetectOnsets(in Span<double> input, ref double onset)
     {
         // Execute phase vocoding on our input
         Span<Polar> fftGrain = stackalloc Polar[realSize];
-        phaseVocoder.Do(in input, ref fftGrain);
+        phaseVocoder.Process(in input, ref fftGrain);
 
         // Apply whitening if enabled
         if (ApplyWhitening)
@@ -145,10 +143,10 @@ public sealed class OnsetDetector
         }
 
         // Execute Spectral Description
-        spectralDescription.Do(in fftGrain, ref spectralOutput);
+        spectralDescription.Perform(in fftGrain, ref spectralOutput);
 
         // Execute Peak Picker
-        peakPicker.Do(in spectralOutput, ref onset);
+        peakPicker.FindPeak(in spectralOutput, ref onset);
 
         totalFrames += hopSize;
         
@@ -175,7 +173,6 @@ public sealed class OnsetDetector
             lastOnset = Math.Max(Delay, newOnset);
             return;
         }
-
         // Check if we are at the beginning of the file with no silence
         else if (totalFrames <= Delay && !Utils.IsSilence(in input, SilenceThreshold))
         {

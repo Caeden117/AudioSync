@@ -26,7 +26,7 @@ internal sealed class PeakPicker
         biquadFilter = new(0.15998789, 0.31997577, 0.15998789, 0.23484048, 0);
     }
 
-    public void Do(in double onset, ref double lastOnset)
+    public void FindPeak(in double onset, ref double lastOnset)
     {
         // Push first onset into our window
         Span<double> windowSpan = window.AsSpan();
