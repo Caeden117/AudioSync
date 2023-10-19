@@ -21,7 +21,7 @@ public sealed class SyncAnalyser
     private readonly double minimumBPM;
     private readonly double maximumBPM;
 
-    public SyncAnalyser(double minimumBPM, double maximumBPM)
+    public SyncAnalyser(double minimumBPM = 85.0, double maximumBPM = 205.0)
     {
         this.minimumBPM = minimumBPM;
         this.maximumBPM = maximumBPM;
