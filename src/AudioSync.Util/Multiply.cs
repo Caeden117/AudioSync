@@ -1,5 +1,4 @@
 ﻿using AudioSync.Util.Exceptions;
-using System.Diagnostics;
 using System.Numerics;
 
 namespace AudioSync.Util;
@@ -61,9 +60,9 @@ public static partial class Utils
         // With the remaining couple of elements left in the span, we will just manually multiply them.
         var remainingStartIdx = length - remaining;
 
-        var remainingA = a.Slice(remainingStartIdx, remaining);
-        var remainingB = b.Slice(remainingStartIdx, remaining);
-        var remainingResult = result.Slice(remainingStartIdx, remaining);
+        var remainingA = a[remainingStartIdx..];
+        var remainingB = b[remainingStartIdx..];
+        var remainingResult = result[remainingStartIdx..];
 
         Multiply(in remainingA, in remainingB, ref remainingResult);
     }
