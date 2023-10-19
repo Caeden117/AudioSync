@@ -153,7 +153,7 @@ public sealed class SyncAnalyser
 
         // Sort by fitness
         // REVIEW: Is this first sort necessary? I dont believe the rounding/de-duplication methods strictly require an ordered list.
-        results.Sort((a, b) => a.Fitness.CompareTo(b.Fitness));
+        results.Sort((a, b) => b.Fitness.CompareTo(a.Fitness));
 
         // Round values close to whole BPMs and remove lesser duplicates
         RoundBPMValues(gapData, results, poly, sampleRate, 0.1, 1);
@@ -164,7 +164,7 @@ public sealed class SyncAnalyser
         RemoveDuplicates(results, 0.0);
 
         // Sort by fitness after rounding and de-duplication
-        results.Sort((a, b) => a.Fitness.CompareTo(b.Fitness));
+        results.Sort((a, b) => b.Fitness.CompareTo(a.Fitness));
 
         // If we have very close results, we perform one last confidence pass as a second check.
         // REVIEW: On average, it may be faster to always re-calculate fitness and sort.
@@ -182,7 +182,7 @@ public sealed class SyncAnalyser
             }
 
             // Have to re-sort with our re-calculated results.
-            results.Sort((a, b) => a.Fitness.CompareTo(b.Fitness));
+            results.Sort((a, b) => b.Fitness.CompareTo(a.Fitness));
         }
 
         // Some implementations pick out the top N results.
@@ -288,7 +288,9 @@ public sealed class SyncAnalyser
         // REVIEW: Stackallocing with the entire length of mono samples will almost assuredly overflow the stack.
         //   However, I don't want to allocate garbage with every invocation.
         //   Should I switch to ArrayPool?
-        Span<double> slopes = stackalloc double[sampleCount];
+        var slopesArr = new double[sampleCount];
+        var slopes = slopesArr.AsSpan();
+        //Span<double> slopes = stackalloc double[sampleCount];
         ComputeSlopes(monoSamples, ref slopes, sampleCount, sampleRate);
 
         // Determine the offbeat sample position.

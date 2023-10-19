@@ -62,6 +62,7 @@ public sealed class OnsetDetector
     private readonly int sampleRate;
     private readonly int hopSize;
     private readonly int bufferSize;
+    private readonly int realSize;
 
     private double spectralOutput;
     private int totalFrames;
@@ -75,7 +76,10 @@ public sealed class OnsetDetector
         this.hopSize = hopSize;
         this.bufferSize = bufferSize;
 
-        phaseVocoder = new(bufferSize, hopSize);
+        // The size of the real half of our buffer (the other half is entirely in the imaginary plane)
+        realSize = (bufferSize / 2) + 1;
+
+        phaseVocoder = new(bufferSize, realSize, hopSize);
         peakPicker = new();
         spectralDescription = new(onsetType, bufferSize);
         adaptiveWhitening = new(bufferSize, hopSize, sampleRate);
@@ -122,7 +126,7 @@ public sealed class OnsetDetector
     public void Do(in Span<double> input, ref double onset)
     {
         // Execute phase vocoding on our input
-        Span<Polar> fftGrain = stackalloc Polar[bufferSize];
+        Span<Polar> fftGrain = stackalloc Polar[realSize];
         phaseVocoder.Do(in input, ref fftGrain);
 
         // Apply whitening if enabled

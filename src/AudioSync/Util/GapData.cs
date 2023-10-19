@@ -24,7 +24,7 @@ internal sealed class GapData
     private int downsample;
     private double[] hammingWindow;
 
-    public GapData(int bufferSize, int downsample, List<Onset> onsets)
+    public GapData(int maxInterval, int downsample, List<Onset> onsets)
     {
         this.onsets = onsets;
         onsetCount = onsets.Count;
@@ -35,7 +35,7 @@ internal sealed class GapData
         hammingWindow = CreateHammingWindow(2048 >> downsample);
 
         wrappedPos = new int[onsetCount];
-        wrappedOnsets = new double[bufferSize];
+        wrappedOnsets = new double[maxInterval];
     }
 
     /// <summary>

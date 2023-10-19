@@ -8,16 +8,18 @@ namespace AudioSync.OnsetDetection.Util;
 internal sealed class PhaseVocoder
 {
     private readonly int hopSize;
+    private readonly int realSize;
     private readonly FFT fft;
     private readonly double[] data;
     private readonly double[] dataOld;
     private readonly double[] hannWindow;
     private readonly int end;
 
-    public PhaseVocoder(int windowSize, int hopSize)
+    public PhaseVocoder(int windowSize, int realSize, int hopSize)
     {
         fft = new FFT(windowSize);
         this.hopSize = hopSize;
+        this.realSize = realSize;
 
         data = new double[windowSize];
         dataOld = windowSize > hopSize
@@ -47,7 +49,7 @@ internal sealed class PhaseVocoder
         Utils.Swap(ref dataSpan);
 
         // Perform FFT
-        Span<Complex> fftData = stackalloc Complex[data.Length];
+        Span<Complex> fftData = stackalloc Complex[realSize];
         fft.Execute(in dataSpan, ref fftData);
 
         // To prevent weird C# errors, we need to make a temporary output buffer
@@ -62,8 +64,9 @@ internal sealed class PhaseVocoder
     {
         Array.Copy(dataOld, 0, data, 0, end);
         
-        var dataOldSpan = dataOld.AsSpan();
-        dataNew[..hopSize].CopyTo(dataOldSpan[end..]);
+        var dataSpan = data.AsSpan();
+        var newDataSlice = dataNew[..hopSize];
+        newDataSlice.CopyTo(dataSpan);
 
         Array.Copy(data, hopSize, dataOld, 0, end);
     }

@@ -43,10 +43,10 @@ internal class Filter
 
             // new input
             // "denormal" appears to be any value less than 0, so we'll just clamp to that
-            startX = Math.Min(input, 0.0);
+            startX = Math.Max(input, 0.0);
             startY = forward[0] * startX;
 
-            for (var j = 0; j < Order; j++)
+            for (var j = 1; j < Order; j++)
             {
                 startY += forward[j] * x[j];
                 startY -= feedback[j] * y[j];

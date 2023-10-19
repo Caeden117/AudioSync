@@ -35,12 +35,19 @@ internal sealed class IntervalTester
     /// </summary>
     public void FillCoarseIntervals(GapData gapData, int coarseIntervals, int intervalDelta)
     {
-        Parallel.For(0, coarseIntervals, i =>
+        for (var i = 0; i < coarseIntervals; i++)
         {
             var idx = i * intervalDelta;
             var interval = minInterval + idx;
             fitness[i] = Math.Max(0.001, gapData.GetConfidenceForInterval(interval));
-        });
+        }
+
+        /*Parallel.For(0, coarseIntervals, i =>
+        {
+            var idx = i * intervalDelta;
+            var interval = minInterval + idx;
+            fitness[i] = Math.Max(0.001, gapData.GetConfidenceForInterval(interval));
+        });*/
     }
 
     /// <summary>
@@ -51,7 +58,17 @@ internal sealed class IntervalTester
         begin = Math.Max(begin, 0);
         end = Math.Min(end, numIntervals);
 
-        Parallel.For(begin, end, i =>
+        for (var i = begin; i < end; i++)
+        {
+            if (fitness[i] > 0) continue;
+
+            var interval = minInterval + begin;
+            var confidence = gapData.GetConfidenceForInterval(interval) - polyFit.Evaluate(interval);
+
+            fitness[i] = Math.Max(confidence, 0.1);
+        }
+
+        /*Parallel.For(begin, end, i =>
         {
             if (fitness[i] > 0) return;
 
@@ -59,7 +76,7 @@ internal sealed class IntervalTester
             var confidence = gapData.GetConfidenceForInterval(interval) - polyFit.Evaluate(interval);
 
             fitness[i] = Math.Max(confidence, 0.1);
-        });
+        });*/
 
         return (begin, end);
     }
