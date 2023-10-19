@@ -59,7 +59,7 @@ public static partial class Utils
         }
 
         // With the remaining couple of elements left in the span, we will just manually multiply them.
-        var remainingStartIdx = length - remaining - 1;
+        var remainingStartIdx = length - remaining;
 
         var remainingA = a.Slice(remainingStartIdx, remaining);
         var remainingB = b.Slice(remainingStartIdx, remaining);
