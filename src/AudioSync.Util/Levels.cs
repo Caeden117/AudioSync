@@ -2,6 +2,8 @@
 
 public static partial class Utils
 {
+    private const double SILENCE_FLOOR = -80.0;
+
     /// <summary>
     /// Gets the average linear level of the given <paramref name="span"/>.
     /// </summary>
@@ -19,7 +21,7 @@ public static partial class Utils
     /// Gets the average sound pressure level of the given <paramref name="span"/> in db.
     /// </summary>
     public static double DBSoundPressureLevel(in Span<double> span)
-        => 10.0 * Math.Log10(LevelLinear(in span));
+        => Math.Max(20.0 * Math.Log10(LevelLinear(in span)), SILENCE_FLOOR);
 
     /// <summary>
     /// Determines if the given <paramref name="span"/> is "silent", if the average sound pressure level is below the given <paramref name="threshold"/>.
