@@ -1,6 +1,4 @@
 ﻿using AudioSync.Util.Exceptions;
-using System.Diagnostics;
-using System.Numerics;
 
 namespace AudioSync.Util;
 
