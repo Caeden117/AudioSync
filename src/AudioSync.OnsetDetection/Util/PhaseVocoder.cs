@@ -10,8 +10,6 @@ internal sealed class PhaseVocoder
     private readonly int hopSize;
     private readonly int realSize;
     private readonly FFT fft;
-    private readonly double[] data;
-    private readonly double[] dataOld;
     private readonly double[] hannWindow;
     private readonly int end;
 
@@ -20,11 +18,6 @@ internal sealed class PhaseVocoder
         fft = new FFT(windowSize);
         this.hopSize = hopSize;
         this.realSize = realSize;
-
-        data = new double[windowSize];
-        dataOld = windowSize > hopSize
-            ? new double[windowSize - hopSize]
-            : new double[1];
 
         // Generate a Hann coefficient window
         hannWindow = SineExpansion(windowSize, 0.5, -0.5);
@@ -36,10 +29,10 @@ internal sealed class PhaseVocoder
 
     public void Process(in Span<double> dataNew, ref Span<Polar> allocatedOutput)
     {
-        // Slide new data
-        SwapBuffers(in dataNew);
+        // Create working data that matches the size of our Hann window
+        Span<double> dataSpan = stackalloc double[hannWindow.Length];
+        dataNew.CopyTo(dataSpan);
 
-        var dataSpan = data.AsSpan();
         var windowSpan = hannWindow.AsSpan();
 
         // Multiply our data by Hann window
@@ -52,23 +45,12 @@ internal sealed class PhaseVocoder
         Span<Complex> fftData = stackalloc Complex[realSize];
         fft.Execute(in dataSpan, ref fftData);
 
-        // To prevent weird C# errors, we need to make a temporary output buffer
-        // to store our Complex-converted-Polar values, *then* copy that into the
-        // allocatedOutput buffer
-        Span<Polar> tempOutput = stackalloc Polar[allocatedOutput.Length];
-        Utils.ToPolar(in fftData, ref tempOutput);
-        tempOutput.CopyTo(allocatedOutput);
-    }
-
-    private void SwapBuffers(in Span<double> dataNew)
-    {
-        Array.Copy(dataOld, 0, data, 0, end);
-        
-        var dataSpan = data.AsSpan();
-        var newDataSlice = dataNew[..hopSize];
-        newDataSlice.CopyTo(dataSpan);
-
-        Array.Copy(data, hopSize, dataOld, 0, end);
+        // Manually convert to Polar coordinates to get around some weird C# problems
+        for (var i = 0; i < realSize; i++)
+        {
+            var complexItem = fftData[i];
+            allocatedOutput[i] = new Polar(complexItem.Magnitude, complexItem.Phase);
+        }
     }
 
     private double[] SineExpansion(int points, params double[] coefficients)

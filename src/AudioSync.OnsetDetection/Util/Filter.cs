@@ -4,22 +4,17 @@ namespace AudioSync.OnsetDetection.Util;
 
 internal abstract class Filter
 {
-    public int Order { get; init; }
-
     protected readonly double[] feedback;
     protected readonly double[] forward;
 
-    private readonly double[] x;
-    private readonly double[] y;
+    private readonly int order;
 
     public Filter(int order)
     {
         Debug.Assert(order > 0, $"{nameof(order)} must be greater than 0.");
 
-        Order = order;
+        this.order = order;
 
-        x = new double[order];
-        y = new double[order];
         feedback = new double[order];
         forward = new double[order];
 
@@ -29,6 +24,12 @@ internal abstract class Filter
 
     public void ForwardFilter(ref Span<double> span)
     {
+        Span<double> x = stackalloc double[order];
+        x.Clear();
+        
+        Span<double> y = stackalloc double[order];
+        y.Clear();
+
         for (var i = 0; i < span.Length; i++)
         {
             ref var input = ref span[i];
@@ -40,7 +41,7 @@ internal abstract class Filter
             startX = Math.Max(input, 0.0);
             startY = forward[0] * startX;
 
-            for (var j = 1; j < Order; j++)
+            for (var j = 1; j < order; j++)
             {
                 startY += forward[j] * x[j];
                 startY -= feedback[j] * y[j];
@@ -50,7 +51,7 @@ internal abstract class Filter
             input = startY;
 
             // prepare next sample
-            for (var j = Order - 1; j > 0; j--)
+            for (var j = order - 1; j > 0; j--)
             {
                 x[j] = x[j - 1];
                 y[j] = y[j - 1];
@@ -65,18 +66,10 @@ internal abstract class Filter
     {
         // First filter, reversing our input afterwards in preparation for the second filter
         ForwardFilter(ref input);
-        Reset();
         input.Reverse();
 
         // Second filter, reversing our input afterwards to return our span back to its original order.
         ForwardFilter(ref input);
-        Reset();
         input.Reverse();
-    }
-
-    public void Reset()
-    {
-        Array.Clear(x, 0, x.Length);
-        Array.Clear(y, 0, y.Length);
     }
 }
