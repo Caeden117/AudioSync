@@ -36,7 +36,7 @@ internal sealed class PhaseVocoder
         var windowSpan = hannWindow.AsSpan();
 
         // Multiply our data by Hann window
-        Utils.Multiply(in dataSpan, in windowSpan, ref dataSpan);
+        Utils.MultiplySIMD(in dataSpan, in windowSpan, ref dataSpan);
 
         // Shift our data window
         Utils.Swap(ref dataSpan);
