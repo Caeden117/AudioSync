@@ -54,7 +54,7 @@ public class FFTTests
     // Fill an array with random numbers, comparing FFT results between our known library and AudioSync.
     private void Test_Internal()
     {
-        double[] doubles = new double[windowSize];
+        var doubles = new double[windowSize];
         var doublesSpan = doubles.AsSpan();
 
         for (var i = 0; i < windowSize; i++)
@@ -62,7 +62,7 @@ public class FFTTests
             doubles[i] = rng.NextDouble();
         }
 
-        Complex[] actual = new Complex[realSize];
+        var actual = new Complex[realSize];
         var actualSpan = actual.AsSpan();
 
         var expected = dspLibFFT.Execute(doubles);
