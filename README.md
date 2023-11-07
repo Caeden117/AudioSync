@@ -26,6 +26,9 @@ reader.Read(samples, 0, sampleLength);
 
 #### Unity
 
+> [!NOTE]  
+> Using AudioSync in Unity projects requires Unity **2021.2** or newer, and [API Compatibility Level](https://docs.unity3d.com/2021.2/Documentation/Manual/dotnetProfileSupport.html) set to **.NET Standard 2.1**.
+
 ```cs
 using UnityEngine;
 
