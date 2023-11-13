@@ -12,6 +12,7 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.7.1" />
     <PackageReference Include="NAudio" Version="2.2.1" />
+    <PackageReference Include="NAudio.Vorbis" Version="1.5.0" />
     <PackageReference Include="NUnit" Version="3.13.3" />
     <PackageReference Include="NUnit3TestAdapter" Version="4.4.2" />
     <PackageReference Include="NUnit.Analyzers" Version="3.6.1" />
@@ -24,25 +25,25 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="Music\Creo\322.mp3">
+    <None Update="Music\Creo\322.ogg">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="Music\Creo\Ahead of the Curve.mp3">
+    <None Update="Music\Creo\Ahead of the Curve.ogg">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="Music\Creo\Dimension.mp3">
+    <None Update="Music\Creo\Dimension.ogg">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="Music\Creo\Place on Fire.mp3">
+    <None Update="Music\Creo\Place on Fire.ogg">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="Music\Creo\Rock Thing.mp3">
+    <None Update="Music\Creo\Rock Thing.ogg">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="Music\Creo\Showdown.mp3">
+    <None Update="Music\Creo\Showdown.ogg">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="Music\Creo\Sphere.mp3">
+    <None Update="Music\Creo\Sphere.ogg">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>

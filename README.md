@@ -17,7 +17,7 @@ using var reader = new AudioFileReader("song.mp3");
 
 var channels = reader.WaveFormat.Channels;
 var sampleRate = reader.WaveFormat.SampleRate;
-var sampleLength = (int)Math.Ceiling(reader.TotalTime.TotalSeconds * sampleRate);
+var sampleLength = (int)Math.Ceiling(reader.TotalTime.TotalSeconds * reader.WaveFormat.AverageBytesPerSecond);
 
 var samples = new float[sampleLength];
 
