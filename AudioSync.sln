@@ -8,6 +8,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{CFA15CBC-1D3F-415C-9BFA-89CA78D2EC6D}"
 	ProjectSection(SolutionItems) = preProject
 		.editorconfig = .editorconfig
+		ExecCodeCoverage.ps1 = ExecCodeCoverage.ps1
 		LICENSE.txt = LICENSE.txt
 		README.md = README.md
 	EndProjectSection
@@ -17,6 +18,8 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AudioSync.Util", "src\AudioSync.Util\AudioSync.Util.csproj", "{81903F82-A005-4E0D-AC99-F2C48FD595A5}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AudioSync.Util.Tests", "src\AudioSync.Util.Tests\AudioSync.Util.Tests.csproj", "{D1589B74-3FD6-4DC3-9229-B1C3CFE433CE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AudioSync.Tests", "src\AudioSync.Tests\AudioSync.Tests.csproj", "{3D44E3E7-40F2-4222-B3B4-689AB2E020EA}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -40,6 +43,10 @@ Global
 		{D1589B74-3FD6-4DC3-9229-B1C3CFE433CE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D1589B74-3FD6-4DC3-9229-B1C3CFE433CE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D1589B74-3FD6-4DC3-9229-B1C3CFE433CE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3D44E3E7-40F2-4222-B3B4-689AB2E020EA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3D44E3E7-40F2-4222-B3B4-689AB2E020EA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3D44E3E7-40F2-4222-B3B4-689AB2E020EA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3D44E3E7-40F2-4222-B3B4-689AB2E020EA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
