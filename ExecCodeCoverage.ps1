@@ -14,9 +14,7 @@ $dir = pwd
 Remove-Item -Recurse -Force $dir/TestResults/
 
 # Run the Coverlet.Collector - REPLACING YOUR SOLUTION NAME!!!
-$output = [string] (& dotnet test ../../AudioSync.sln --collect:"XPlat Code Coverage" 2>&1)
-Write-Host "Last Exit Code: $lastexitcode"
-Write-Host $output
+dotnet test AudioSync.sln --collect:"XPlat Code Coverage"
 
 # Delete previous test run reports - note if you're getting wrong results do a Solution Clean and Rebuild to remove stale DLLs in the bin folder
 Remove-Item -Recurse -Force $dir/coveragereport/
