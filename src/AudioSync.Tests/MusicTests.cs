@@ -31,7 +31,7 @@ public class MusicTests
     public void CalculateSongBPM()
     {
         // Read mono samples
-        var reader = new VorbisWaveReader(song);
+        var reader = new VorbisWaveReader(Path.GetFullPath(song));
         var channels = reader.WaveFormat.Channels;
         var sampleLength = (int)Math.Ceiling(reader.TotalTime.TotalSeconds * reader.WaveFormat.AverageBytesPerSecond);
 
