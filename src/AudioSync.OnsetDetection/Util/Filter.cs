@@ -38,7 +38,7 @@ internal abstract class Filter
 
             // new input
             // "denormal" appears to be any value less than 0, so we'll just clamp to that
-            startX = (float)Math.Max(input, 0.0);
+            startX = MathF.Max(input, 0.0f);
             startY = forward[0] * startX;
 
             for (var j = 1; j < order; j++)

@@ -32,9 +32,9 @@ internal sealed class ComplexDomain : BaseSpectralDescription
 
             // compute euclidean distance in the complex domain
             var euclideanDistance = (oldMag * oldMag) + (grain.Norm * grain.Norm);
-            euclideanDistance -= 2 * oldMag * grain.Norm * (float)Math.Cos(currentMeasureVector[i] - grain.Phase);
-            euclideanDistance = (float)Math.Abs(euclideanDistance);
-            euclideanDistance = (float)Math.Sqrt(euclideanDistance);
+            euclideanDistance -= 2 * oldMag * grain.Norm * MathF.Cos(currentMeasureVector[i] - grain.Phase);
+            euclideanDistance = MathF.Abs(euclideanDistance);
+            euclideanDistance = MathF.Sqrt(euclideanDistance);
             onset += euclideanDistance;
 
             // Push back frames

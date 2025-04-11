@@ -21,7 +21,7 @@ public static partial class Utils
     /// Gets the average sound pressure level of the given <paramref name="span"/> in db.
     /// </summary>
     public static float DBSoundPressureLevel(in Span<float> span)
-        => (float)Math.Max(20.0 * Math.Log10(LevelLinear(in span)), SILENCE_FLOOR);
+        => MathF.Max(20.0f * MathF.Log10(LevelLinear(in span)), SILENCE_FLOOR);
 
     /// <summary>
     /// Determines if the given <paramref name="span"/> is "silent", if the average sound pressure level is below the given <paramref name="threshold"/>.

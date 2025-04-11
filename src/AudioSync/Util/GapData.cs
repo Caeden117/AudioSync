@@ -195,7 +195,7 @@ internal sealed class GapData
     {
         var output = new float[n];
         var t = 6.2831853071795864f / (n - 1);
-        for (var i = 0; i < n; ++i) output[i] = 0.54f - (0.46f * (float)Math.Cos(i * t));
+        for (var i = 0; i < n; ++i) output[i] = 0.54f - (0.46f * MathF.Cos(i * t));
         return output;
     }
 }

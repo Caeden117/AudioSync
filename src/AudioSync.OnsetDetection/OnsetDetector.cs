@@ -13,7 +13,7 @@ public sealed class OnsetDetector
     public float MinInterOnsetIntervalSeconds
     {
         get => MinInterOnsetInterval / (float)sampleRate;
-        set => MinInterOnsetInterval = (int)Math.Round(value * sampleRate);
+        set => MinInterOnsetInterval = (int)MathF.Round(value * sampleRate);
     }
 
     public float MinInterOnsetIntervalMilliseconds

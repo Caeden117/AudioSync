@@ -31,7 +31,7 @@ public sealed class FFT
         // Set length total first, because we immediately perform validation afterwards
         lengthTotal = dataLength + zeroPaddingLength;
 
-        var log2 = Math.Log(lengthTotal, 2);
+        var log2 = MathF.Log(lengthTotal, 2);
 
         if (log2 % 1 != 0) throw new AudioSyncFatalException($"{nameof(dataLength)} and {nameof(zeroPaddingLength)} must equal a power of 2.");
 
@@ -67,10 +67,10 @@ public sealed class FFT
         var indexStep = 1;
         for (int i = 0; i < fftLog2; i++)
         {
-            var angleInc = indexStep * -2 * Math.PI / lengthTotal;
+            var angleInc = indexStep * -2 * MathF.PI / lengthTotal;
 
-            angleIncSin[i] = (float)Math.Sin(angleInc);
-            angleIncCos[i] = (float)Math.Cos(angleInc);
+            angleIncSin[i] = MathF.Sin(angleInc);
+            angleIncCos[i] = MathF.Cos(angleInc);
 
             // Double index step
             indexStep <<= 1;

@@ -39,7 +39,7 @@ internal sealed class IntervalTester
         {
             var idx = i * intervalDelta;
             var interval = minInterval + idx;
-            fitness[i] = Math.Max(0.001f, gapData.GetConfidenceForInterval(interval));
+            fitness[i] = MathF.Max(0.001f, gapData.GetConfidenceForInterval(interval));
         }
 
         /*Parallel.For(0, coarseIntervals, i =>
@@ -65,7 +65,7 @@ internal sealed class IntervalTester
             var interval = minInterval + begin;
             var confidence = gapData.GetConfidenceForInterval(interval) - (float)polyFit.Evaluate(interval);
 
-            fitness[i] = Math.Max(confidence, 0.1f);
+            fitness[i] = MathF.Max(confidence, 0.1f);
         }
 
         /*Parallel.For(begin, end, i =>

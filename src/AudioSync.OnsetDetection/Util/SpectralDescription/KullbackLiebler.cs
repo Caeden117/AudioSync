@@ -17,7 +17,7 @@ internal sealed class KullbackLiebler : BaseSpectralDescription
             ref var grain = ref fftGrain[i];
             ref var mag = ref oldMagnitude[i];
 
-            onset += grain.Norm * (float)Math.Log(1 + (grain.Norm / (mag + 1e-1)));
+            onset += grain.Norm * MathF.Log(1 + (grain.Norm / (mag + 1e-1f)));
             mag = grain.Norm;
         }
 

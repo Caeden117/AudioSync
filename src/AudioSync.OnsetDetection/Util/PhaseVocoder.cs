@@ -58,7 +58,7 @@ internal sealed class PhaseVocoder
         Span<float> z = stackalloc float[points];
         for (var i = 0; i < points; i++)
         {
-            z[i] = 2.0f * (float)Math.PI * i / points;
+            z[i] = 2.0f * MathF.PI * i / points;
         }
 
         var window = new float[points];
@@ -69,7 +69,7 @@ internal sealed class PhaseVocoder
             
             for (var j = 1; j < coefficients.Length; j++)
             {
-                coefficient += coefficients[j] * (float)Math.Cos(j * z[i]);
+                coefficient += coefficients[j] * MathF.Cos(j * z[i]);
             }
 
             window[i] = coefficient;

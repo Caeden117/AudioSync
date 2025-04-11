@@ -19,7 +19,7 @@ internal sealed class AdaptiveWhitening
         set
         {
             relaxTime = value;
-            decay = (float)Math.Pow(defaultDecay, hopSize / sampleRate / relaxTime);
+            decay = MathF.Pow(defaultDecay, hopSize / sampleRate / relaxTime);
         }
     }
 
@@ -53,8 +53,8 @@ internal sealed class AdaptiveWhitening
             ref var polar = ref fftGrain[i];
             ref var peak = ref peaks[i];
 
-            var newPeak = Math.Max(decay * peak, Floor);
-            peak = Math.Max(polar.Norm, newPeak);
+            var newPeak = MathF.Max(decay * peak, Floor);
+            peak = MathF.Max(polar.Norm, newPeak);
 
             polar = polar with { Norm = polar.Norm / peak };
         }

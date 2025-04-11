@@ -2,5 +2,5 @@
 
 public readonly record struct Polar(float Norm, float Phase)
 {
-    public Polar LogMag(float lambda) => this with { Norm = (float)Math.Log((lambda * Norm) + 1) };
+    public Polar LogMag(float lambda) => this with { Norm = MathF.Log((lambda * Norm) + 1) };
 }

@@ -67,9 +67,9 @@ public sealed class SyncAnalyser
             var strength = 0.0f;
             for (var j = windowMin; j < windowMax; j++)
             {
-                strength += Math.Abs(monoAudioData[j]);
+                strength += MathF.Abs(monoAudioData[j]);
             }
-            strength /= Math.Max(1, windowMax - windowMin);
+            strength /= MathF.Max(1, windowMax - windowMin);
 
             detectedOnsets.Add(new(onsetDetection.LastOffset, strength));
         }
@@ -128,11 +128,11 @@ public sealed class SyncAnalyser
         var poly = Polynomial.Fit(polyX, polyY, 3);
 
         // Normalize fitness values with our new polynomial
-        var maxFitness = 0.001;
+        var maxFitness = 0.001f;
         for (var i = 0; i < numIntervals; i += INTERVAL_DELTA)
         {
             fitness[i] -= (float)poly.Evaluate(i + minInterval);
-            maxFitness = Math.Max(maxFitness, fitness[i]);
+            maxFitness = MathF.Max(maxFitness, fitness[i]);
         }
 
         // Create initial results around our best intervals
@@ -156,12 +156,12 @@ public sealed class SyncAnalyser
         results.Sort((a, b) => b.Fitness.CompareTo(a.Fitness));
 
         // Round values close to whole BPMs and remove lesser duplicates
-        RoundBPMValues(gapData, results, poly, sampleRate, 0.1, 1);
-        RemoveDuplicates(results, 0.1);
+        RoundBPMValues(gapData, results, poly, sampleRate, 0.1f, 1);
+        RemoveDuplicates(results, 0.1f);
 
         // More general rounding, gives more generous results, followed by another de-duplication.
-        RoundBPMValues(gapData, results, poly, sampleRate, 0.3, ROUNDING_THRESHOLD);
-        RemoveDuplicates(results, 0.0);
+        RoundBPMValues(gapData, results, poly, sampleRate, 0.3f, ROUNDING_THRESHOLD);
+        RemoveDuplicates(results, 0.0f);
 
         // Sort by fitness after rounding and de-duplication
         results.Sort((a, b) => b.Fitness.CompareTo(a.Fitness));
@@ -191,15 +191,15 @@ public sealed class SyncAnalyser
     }
 
     // Rounds BPM values that are close to integer values.
-    private void RoundBPMValues(GapData gapData, IList<SyncResult> results, Polynomial polyFit, int sampleRate, double range, double threshold)
+    private void RoundBPMValues(GapData gapData, IList<SyncResult> results, Polynomial polyFit, int sampleRate, float range, float threshold)
     {
         for (var i = 0; i < results.Count; i++)
         {
             var result = results[i];
 
             // Calculate the difference between our BPM and a theoretical rounded BPM
-            var roundedBPM = (float)Math.Round(result.BPM);
-            var diff = Math.Abs(roundedBPM - result.BPM);
+            var roundedBPM = MathF.Round(result.BPM);
+            var diff = MathF.Abs(roundedBPM - result.BPM);
 
             // Ignore this result if the difference proves too much to bother
             if (diff > range) continue;
@@ -221,27 +221,27 @@ public sealed class SyncAnalyser
     }
 
     // Removes near-duplicates or multiples of existing BPMs
-    private void RemoveDuplicates(IList<SyncResult> results, double precision)
+    private void RemoveDuplicates(IList<SyncResult> results, float precision)
     {
         // Sweep forwards
         for (var i = 0; i < results.Count; i++)
         {
             var bpm = results[i].BPM;
             var doubled = bpm * 2;
-            var halved = bpm * 0.5;
+            var halved = bpm * 0.5f;
 
             // Check backwards so we aren't messing up the forwards sweep
             for (var j = results.Count - 1; j > i; j--)
             {
                 var other = results[j].BPM;
 
-                var bpmDifference = Math.Abs(bpm - other);
-                var halfBPMDifference = Math.Abs(halved - other);
-                var doubledBPMDifference = Math.Abs(doubled - other);
+                var bpmDifference = MathF.Abs(bpm - other);
+                var halfBPMDifference = MathF.Abs(halved - other);
+                var doubledBPMDifference = MathF.Abs(doubled - other);
 
                 // Kinda wish Math had params overloads but oh well
                 // This just takes the minimum difference between normal/half/doubled BPM and the BPM we are checking
-                var minDifference = Math.Min(Math.Min(bpmDifference, halfBPMDifference), doubledBPMDifference);
+                var minDifference = MathF.Min(MathF.Min(bpmDifference, halfBPMDifference), doubledBPMDifference);
 
                 // If difference is too much, this other BPM is likely not a duplicate
                 if (minDifference > precision) continue;
@@ -258,7 +258,7 @@ public sealed class SyncAnalyser
     {
         // Create gapdata buffers for testing.
         var maxInterval = 0.0f;
-        foreach (var result in results) maxInterval = (float)Math.Max(maxInterval, sampleRate * 60.0 / result.BPM);
+        foreach (var result in results) maxInterval = MathF.Max(maxInterval, sampleRate * 60.0f / result.BPM);
         var gapData = new GapData((int)(maxInterval + 1.0), 1, onsets);
 
         for (var i = 0; i < results.Count; i++)
@@ -330,8 +330,8 @@ public sealed class SyncAnalyser
         var sumR = 0.0f;
         for (var i = 0; i < wh; i++)
         {
-            sumL += Math.Abs(samples[i]);
-            sumR += Math.Abs(samples[i + wh]);
+            sumL += MathF.Abs(samples[i]);
+            sumR += MathF.Abs(samples[i + wh]);
         }
 
         // Slide window over the samples.
@@ -339,16 +339,16 @@ public sealed class SyncAnalyser
         for (int i = wh; i < numFrames - wh; i++)
         {
             // Determine slope value.
-            output[i] = Math.Max(0.0f, (sumR - sumL) * scalar);
+            output[i] = MathF.Max(0.0f, (sumR - sumL) * scalar);
 
             // Slide window over.
-            var cur = Math.Abs(samples[i]);
+            var cur = MathF.Abs(samples[i]);
             
-            sumL -= Math.Abs(samples[i - wh]);
+            sumL -= MathF.Abs(samples[i - wh]);
             sumL += cur;
 
             sumR -= cur;
-            sumR += Math.Abs(samples[i + wh]);
+            sumR += MathF.Abs(samples[i + wh]);
         }
     }
 }
