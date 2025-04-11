@@ -8,11 +8,11 @@
 public class LargerQuickSortTests
 {
     private readonly Random rng = new();
-    private readonly double[] numbers;
+    private readonly float[] numbers;
 
     public LargerQuickSortTests(int n)
     {
-        numbers = new double[n];
+        numbers = new float[n];
 
         // Fill with RNG data
         for (var i = 0; i < n; i++)

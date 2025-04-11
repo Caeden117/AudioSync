@@ -5,7 +5,7 @@ public class SimplePeakPickTests
     [Test]
     public void CanFindPeak()
     {
-        var peaks = new double[] { 0.0, 1.0, 0.0 };
+        var peaks = new float[] { 0.0f, 1.0f, 0.0f };
         var span = peaks.AsSpan();
 
         var isPeak = Utils.PeakPick(in span, 1);
@@ -16,7 +16,7 @@ public class SimplePeakPickTests
     [Test]
     public void PeakFailsOnLeft()
     {
-        var peaks = new double[] { 1.0, 0.5, 0.0 };
+        var peaks = new float[] { 1.0f, 0.5f, 0.0f };
         var span = peaks.AsSpan();
 
         // This should return false because element 0 is higher.
@@ -28,7 +28,7 @@ public class SimplePeakPickTests
     [Test]
     public void PeakFailsOnRight()
     {
-        var peaks = new double[] { 0.0, 0.5, 1.0 };
+        var peaks = new float[] { 0.0f, 0.5f, 1.0f };
         var span = peaks.AsSpan();
 
         // This should return false because element 2 is higher.
@@ -40,7 +40,7 @@ public class SimplePeakPickTests
     [Test]
     public void PeakFailsOnNegatives()
     {
-        var peaks = new double[] { -1.0, -0.5, -1.0 };
+        var peaks = new float[] { -1.0f, -0.5f, -1.0f };
         var span = peaks.AsSpan();
 
         // This should return false because the "peak" needs to be above 0.0 amplitude.
@@ -52,7 +52,7 @@ public class SimplePeakPickTests
     [Test]
     public void ThrowsOnLeftmostIndex()
     {
-        var peaks = new double[] { 1.0, 1.0, 1.0 };
+        var peaks = new float[] { 1.0f, 1.0f, 1.0f };
 
         Assert.Throws<ArgumentOutOfRangeException>(() =>
         {
@@ -65,7 +65,7 @@ public class SimplePeakPickTests
     [Test]
     public void ThrowsOnRightmostIndex()
     {
-        var peaks = new double[] { 1.0, 1.0, 1.0 };
+        var peaks = new float[] { 1.0f, 1.0f, 1.0f };
 
         Assert.Throws<ArgumentOutOfRangeException>(() =>
         {

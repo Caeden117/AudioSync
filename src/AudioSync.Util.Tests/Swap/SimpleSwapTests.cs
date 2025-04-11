@@ -10,7 +10,7 @@ internal class SimpleSwapTests
     {
         Assert.Throws<AudioSyncFatalException>(() =>
         {
-            Span<double> span = stackalloc double[] { 1.0 };
+            Span<float> span = stackalloc float[] { 1.0f };
 
             Utils.Swap(ref span);
         });
@@ -21,7 +21,7 @@ internal class SimpleSwapTests
     {
         Assert.Throws<AudioSyncFatalException>(() =>
         {
-            Span<double> span = stackalloc double[0];
+            Span<float> span = stackalloc float[0];
 
             Utils.Swap(ref span);
         });

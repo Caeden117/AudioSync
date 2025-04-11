@@ -9,7 +9,7 @@ public class PushTestSimple
     [SuppressMessage("Assertion", "NUnit2045:Use Assert.Multiple", Justification = "Span cannot be accessed in a lambda")]
     public void Push()
     {
-        Span<double> numbers = stackalloc double[] { 0, 1, 2 };
+        Span<float> numbers = stackalloc float[] { 0, 1, 2 };
 
         Utils.Push(ref numbers, 3);
 
@@ -21,7 +21,7 @@ public class PushTestSimple
     [Test]
     public void PushSingle()
     {
-        var arr = new double[1] { 0 };
+        var arr = new float[1] { 0 };
 
         var span = arr.AsSpan();
 
@@ -35,10 +35,10 @@ public class PushTestSimple
     {
         Assert.Throws<AudioSyncFatalException>(() =>
         {
-            var arr = Array.Empty<double>();
+            var arr = Array.Empty<float>();
             var span = arr.AsSpan();
 
-            Utils.Push(ref span, 2.0);
+            Utils.Push(ref span, 2.0f);
         });
     }
 }

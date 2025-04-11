@@ -4,7 +4,7 @@ namespace AudioSync.Util;
 
 internal sealed class IntervalTester
 {
-    public double[] Fitness => fitness;
+    public float[] Fitness => fitness;
 
     private readonly int minInterval;
     private readonly int maxInterval;
@@ -12,7 +12,7 @@ internal sealed class IntervalTester
 
     private readonly int sampleRate;
 
-    private readonly double[] fitness;
+    private readonly float[] fitness;
 
     public IntervalTester(int sampleRate, int minInterval, int maxInterval)
     {
@@ -22,13 +22,13 @@ internal sealed class IntervalTester
         this.maxInterval = maxInterval;
         numIntervals = maxInterval - minInterval;
 
-        fitness = new double[numIntervals];
+        fitness = new float[numIntervals];
     }
 
     /// <summary>
     /// Converts a given interval to a BPM
     /// </summary>
-    public double IntervalToBPM(int i) => sampleRate * 60.0 / (i + minInterval);
+    public float IntervalToBPM(int i) => sampleRate * 60.0f / (i + minInterval);
 
     /// <summary>
     /// Calculates fitness values with coarse intervals
@@ -39,7 +39,7 @@ internal sealed class IntervalTester
         {
             var idx = i * intervalDelta;
             var interval = minInterval + idx;
-            fitness[i] = Math.Max(0.001, gapData.GetConfidenceForInterval(interval));
+            fitness[i] = Math.Max(0.001f, gapData.GetConfidenceForInterval(interval));
         }
 
         /*Parallel.For(0, coarseIntervals, i =>
@@ -63,9 +63,9 @@ internal sealed class IntervalTester
             if (fitness[i] > 0) continue;
 
             var interval = minInterval + begin;
-            var confidence = gapData.GetConfidenceForInterval(interval) - polyFit.Evaluate(interval);
+            var confidence = gapData.GetConfidenceForInterval(interval) - (float)polyFit.Evaluate(interval);
 
-            fitness[i] = Math.Max(confidence, 0.1);
+            fitness[i] = Math.Max(confidence, 0.1f);
         }
 
         /*Parallel.For(begin, end, i =>
@@ -85,7 +85,7 @@ internal sealed class IntervalTester
     /// Given our calculated fitness values from <see cref="FillCoarseIntervals(GapData)"/> or <see cref="FillIntervalRange(GapData, Polynomial, int, int)"/>,
     /// return the best interval.
     /// </summary>
-    public int FindBestInterval(double[] fitness, int begin, int end)
+    public int FindBestInterval(float[] fitness, int begin, int end)
     {
         var best = 0;
         var highest = 0.0;

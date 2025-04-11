@@ -4,11 +4,11 @@ namespace AudioSync.OnsetDetection.Util.SpectralDescription;
 
 internal sealed class KullbackLiebler : BaseSpectralDescription
 {
-    private readonly double[] oldMagnitude;
+    private readonly float[] oldMagnitude;
 
-    public KullbackLiebler(int realSize) => oldMagnitude = new double[realSize];
+    public KullbackLiebler(int realSize) => oldMagnitude = new float[realSize];
 
-    public override void Perform(in Span<Polar> fftGrain, ref double onset)
+    public override void Perform(in Span<Polar> fftGrain, ref float onset)
     {
         onset = default;
 
@@ -17,10 +17,10 @@ internal sealed class KullbackLiebler : BaseSpectralDescription
             ref var grain = ref fftGrain[i];
             ref var mag = ref oldMagnitude[i];
 
-            onset += grain.Norm * Math.Log(1 + (grain.Norm / (mag + 1e-1)));
+            onset += grain.Norm * (float)Math.Log(1 + (grain.Norm / (mag + 1e-1)));
             mag = grain.Norm;
         }
 
-        if (double.IsNaN(onset)) onset = default;
+        if (float.IsNaN(onset)) onset = default;
     }
 }

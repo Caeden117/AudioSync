@@ -5,36 +5,36 @@ namespace AudioSync.OnsetDetection.Util;
 internal sealed class AdaptiveWhitening
 {
     // In seconds, between 22-446
-    private const double defaultRelaxTime = 250;
+    private const float defaultRelaxTime = 250;
 
     // Attenuation of roughly -60dB
-    private const double defaultDecay = 0.001f;
+    private const float defaultDecay = 0.001f;
 
     // Default floor
-    private const double defaultFloor = 1e-4f;
+    private const float defaultFloor = 1e-4f;
 
-    public double RelaxTime
+    public float RelaxTime
     {
         get => relaxTime;
         set
         {
             relaxTime = value;
-            decay = Math.Pow(defaultDecay, hopSize / sampleRate / relaxTime);
+            decay = (float)Math.Pow(defaultDecay, hopSize / sampleRate / relaxTime);
         }
     }
 
-    public double Floor { get; set; }
+    public float Floor { get; set; }
 
     private readonly int hopSize;
     private readonly int sampleRate;
-    private readonly double[] peaks;
+    private readonly float[] peaks;
 
-    private double relaxTime;
-    private double decay;
+    private float relaxTime;
+    private float decay;
 
     public AdaptiveWhitening(int bufferSize, int hopSize, int sampleRate)
     {
-        peaks = new double[(bufferSize / 2) + 1];
+        peaks = new float[(bufferSize / 2) + 1];
         this.hopSize = hopSize;
         this.sampleRate = sampleRate;
         

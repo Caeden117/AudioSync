@@ -7,16 +7,16 @@ public static partial class Utils
     /// <summary>
     /// Swap the two halves of <paramref name="span"/>.
     /// </summary>
-    public static void Swap(ref Span<double> span)
+    public static void Swap(ref Span<float> span)
     {
         if (span.Length <= 1) throw new AudioSyncFatalException($"{nameof(span)} needs to have at least 2 elements.");
 
         var half = span.Length / 2;
         var halfIdx = half + (span.Length % 2);
 
-        Span<double> temp = stackalloc double[half];
+        Span<float> temp = stackalloc float[half];
 
-        var firstHalf = span.Slice(0, half);
+        var firstHalf = span[..half];
         var secondHalf = span.Slice(halfIdx, half);
 
         firstHalf.CopyTo(temp);
@@ -37,7 +37,7 @@ public static partial class Utils
     /// <remarks>
     /// The first element of <paramref name="span"/> will be pushed out and lost.
     /// </remarks>
-    public static void Push(ref Span<double> span, double element)
+    public static void Push(ref Span<float> span, float element)
     {
         if (span.IsEmpty) throw new AudioSyncFatalException($"{nameof(span)} cannot be empty.");
 

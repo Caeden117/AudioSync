@@ -4,7 +4,7 @@ namespace AudioSync.OnsetDetection.Util.SpectralDescription;
 
 internal sealed class HighFrequencyContent : BaseSpectralDescription
 {
-    public override void Perform(in Span<Polar> fftGrain, ref double onset)
+    public override void Perform(in Span<Polar> fftGrain, ref float onset)
     {
         onset = default;
 

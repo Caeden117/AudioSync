@@ -13,7 +13,7 @@ public static partial class Utils
         for (var i = 0; i < complex.Length; i++)
         {
             var complexItem = complex[i];
-            allocatedOutput[i] = new(complexItem.Magnitude, complexItem.Phase);
+            allocatedOutput[i] = new((float)complexItem.Magnitude, (float)complexItem.Phase);
         }
     }
 }

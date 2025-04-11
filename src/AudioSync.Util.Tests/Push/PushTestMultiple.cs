@@ -12,7 +12,7 @@ public class PushTestMultiple
     [Test]
     public void Push()
     {
-        Span<double> numbers = stackalloc double[n];
+        Span<float> numbers = stackalloc float[n];
 
         for (var i = 0; i < n; i++)
         {
@@ -30,7 +30,7 @@ public class PushTestMultiple
     [Test]
     public void MultiShift()
     {
-        Span<double> numbers = stackalloc double[n];
+        Span<float> numbers = stackalloc float[n];
         numbers.Clear();
 
         for (var i = 0; i < n; i++)

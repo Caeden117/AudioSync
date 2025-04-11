@@ -55,11 +55,13 @@ public class FFTTests
     private void Test_Internal()
     {
         var doubles = new double[windowSize];
-        var doublesSpan = doubles.AsSpan();
+        var floatSpan = new float[windowSize].AsSpan();
 
         for (var i = 0; i < windowSize; i++)
         {
-            doubles[i] = rng.NextDouble();
+            var randomValue = rng.NextSingle();
+            doubles[i] = randomValue;
+            floatSpan[i] = randomValue;
         }
 
         var actual = new Complex[realSize];
@@ -67,7 +69,7 @@ public class FFTTests
 
         var expected = dspLibFFT.Execute(doubles);
 
-        audioSyncFFT.Execute(in doublesSpan, ref actualSpan);
+        audioSyncFFT.Execute(in floatSpan, ref actualSpan);
 
         // We need to manually compare each Real component within basically floating point error
         // (I personally don't mind small differences, but if our FFT starts giving wildly different results, that means something is probably wrong.)
@@ -75,7 +77,7 @@ public class FFTTests
         // so we only need to compare against the Real components of our Complex results.
         for (var j = 0; j < realSize; j++)
         {
-            Assert.That(actual[j].Real, Is.EqualTo(expected[j].Real).Within(0.0000000001));
+            Assert.That(actual[j].Real, Is.EqualTo(expected[j].Real).Within(0.00001));
         }
     }
 }

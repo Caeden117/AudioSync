@@ -18,11 +18,11 @@ internal sealed class GapData
 
     private readonly List<Onset> onsets;
     private readonly int[] wrappedPos;
-    private readonly double[] wrappedOnsets;
+    private readonly float[] wrappedOnsets;
     private readonly int onsetCount;
 
     private int downsample;
-    private double[] hammingWindow;
+    private float[] hammingWindow;
 
     public GapData(int maxInterval, int downsample, List<Onset> onsets)
     {
@@ -35,17 +35,17 @@ internal sealed class GapData
         hammingWindow = CreateHammingWindow(2048 >> downsample);
 
         wrappedPos = new int[onsetCount];
-        wrappedOnsets = new double[maxInterval];
+        wrappedOnsets = new float[maxInterval];
     }
 
     /// <summary>
     /// Returns a confidence value representing the vicinity of nearby onsets
     /// </summary>
-    public double GapConfidence(int gapPos, int interval)
+    public float GapConfidence(int gapPos, int interval)
     {
         var windowSize = hammingWindow.Length;
         var halfWindowSize = windowSize / 2;
-        var area = 0.0;
+        var area = 0.0f;
 
         var beginOnset = gapPos - halfWindowSize;
         var endOnset = gapPos + halfWindowSize;
@@ -85,7 +85,7 @@ internal sealed class GapData
     /// <summary>
     /// Returns the gap confidence for the specified interval
     /// </summary>
-    public double GetConfidenceForInterval(int interval)
+    public float GetConfidenceForInterval(int interval)
     {
         Array.Clear(wrappedOnsets, 0, wrappedOnsets.Length);
 
@@ -99,13 +99,13 @@ internal sealed class GapData
         }
 
         // Record the amount of support for each gap value.
-        var highestConfidence = 0.0;
+        var highestConfidence = 0.0f;
         for (var i = 0; i < onsetCount; ++i)
         {
             var pos = wrappedPos[i];
             var confidence = GapConfidence(pos, reducedInterval);
             var offbeatPos = (pos + (reducedInterval / 2)) % reducedInterval;
-            confidence += GapConfidence(offbeatPos, reducedInterval) * 0.5;
+            confidence += GapConfidence(offbeatPos, reducedInterval) * 0.5f;
 
             if (confidence > highestConfidence)
             {
@@ -119,12 +119,12 @@ internal sealed class GapData
     /// <summary>
     /// Returns the gap confidence for the given BPM
     /// </summary>
-    public double GetConfidenceForBPM(int sampleRate, double bpm, Polynomial polyFit)
+    public float GetConfidenceForBPM(int sampleRate, float bpm, Polynomial polyFit)
     {
         Array.Clear(wrappedOnsets, 0, wrappedOnsets.Length);
 
-        var intervalf = sampleRate * 60.0 / bpm;
-        var interval = (int)(intervalf + 0.5);
+        var intervalf = sampleRate * 60.0f / bpm;
+        var interval = (int)(intervalf + 0.5f);
         for (var i = 0; i < onsetCount; ++i)
         {
             var pos = (int)(onsets[i].Position % intervalf);
@@ -133,13 +133,13 @@ internal sealed class GapData
         }
 
         // Record the amount of support for each gap value.
-        var highestConfidence = 0.0;
+        var highestConfidence = 0.0f;
         for (var i = 0; i < onsetCount; ++i)
         {
             var pos = wrappedPos[i];
             var confidence = GapConfidence(pos, interval);
             var offbeatPos = (pos + (interval / 2)) % interval;
-            confidence += GapConfidence(offbeatPos, interval) * 0.5;
+            confidence += GapConfidence(offbeatPos, interval) * 0.5f;
 
             if (confidence > highestConfidence)
             {
@@ -148,7 +148,7 @@ internal sealed class GapData
         }
 
         // Normalize the confidence value.
-        highestConfidence -= polyFit.Evaluate(intervalf);
+        highestConfidence -= (float)polyFit.Evaluate(intervalf);
 
         return highestConfidence;
     }
@@ -156,7 +156,7 @@ internal sealed class GapData
     /// <summary>
     /// Returns the most promising offset for the given BPM value.
     /// </summary>
-    public double GetBaseOffsetValue(int sampleRate, double bpm)
+    public float GetBaseOffsetValue(int sampleRate, double bpm)
     {
         Array.Clear(wrappedOnsets, 0, wrappedOnsets.Length);
 
@@ -167,18 +167,18 @@ internal sealed class GapData
         {
             var pos = (int)(onsets[i].Position % intervalf);
             wrappedPos[i] = pos;
-            wrappedOnsets[pos] += 1.0;
+            wrappedOnsets[pos] += 1.0f;
         }
 
         // Record the amount of support for each gap value.
-        var highestConfidence = 0.0;
-        var offsetPos = 0;
+        var highestConfidence = 0.0f;
+        var offsetPos = 0.0f;
         for (var i = 0; i < onsetCount; ++i)
         {
             var pos = wrappedPos[i];
             var confidence = GapConfidence(pos, interval);
             var offbeatPos = (pos + (interval / 2)) % interval;
-            confidence += GapConfidence(offbeatPos, interval) * 0.5;
+            confidence += GapConfidence(offbeatPos, interval) * 0.5f;
 
             if (confidence > highestConfidence)
             {
@@ -187,15 +187,15 @@ internal sealed class GapData
             }
         }
 
-        return (double)offsetPos / sampleRate;
+        return offsetPos / sampleRate;
     }
 
     // Creates weights for a hamming window of length n.
-    private double[] CreateHammingWindow(int n)
+    private float[] CreateHammingWindow(int n)
     {
-        var output = new double[n];
-        var t = 6.2831853071795864 / (n - 1);
-        for (var i = 0; i < n; ++i) output[i] = 0.54 - (0.46 * Math.Cos(i * t));
+        var output = new float[n];
+        var t = 6.2831853071795864f / (n - 1);
+        for (var i = 0; i < n; ++i) output[i] = 0.54f - (0.46f * (float)Math.Cos(i * t));
         return output;
     }
 }

@@ -23,8 +23,8 @@ public sealed class FFT
     private readonly int lengthHalf = 0;
     private readonly FFTElement[] fftElements;
 
-    private readonly double[] angleIncSin;
-    private readonly double[] angleIncCos;
+    private readonly float[] angleIncSin;
+    private readonly float[] angleIncCos;
 
     public FFT(int dataLength, int zeroPaddingLength = 0)
     {
@@ -61,23 +61,23 @@ public sealed class FFT
         }
 
         // Allocate sine/cosine LUTs used during FFT execution
-        angleIncSin = new double[fftLog2];
-        angleIncCos = new double[fftLog2];
+        angleIncSin = new float[fftLog2];
+        angleIncCos = new float[fftLog2];
 
         var indexStep = 1;
         for (int i = 0; i < fftLog2; i++)
         {
             var angleInc = indexStep * -2 * Math.PI / lengthTotal;
 
-            angleIncSin[i] = Math.Sin(angleInc);
-            angleIncCos[i] = Math.Cos(angleInc);
+            angleIncSin[i] = (float)Math.Sin(angleInc);
+            angleIncCos[i] = (float)Math.Cos(angleInc);
 
             // Double index step
             indexStep <<= 1;
         }
     }
 
-    public void Execute(in Span<double> timeSeries, ref Span<Complex> allocatedOutput)
+    public void Execute(in Span<float> timeSeries, ref Span<Complex> allocatedOutput)
     {
         if (timeSeries.Length < lengthTotal) throw new AudioSyncFatalException($"Length of {nameof(timeSeries)} is expected to be at least {lengthTotal}.");
         if (allocatedOutput.Length < lengthHalf) throw new AudioSyncFatalException($"Length of {nameof(allocatedOutput)} expected to be at least {lengthHalf}.");
@@ -109,8 +109,8 @@ public sealed class FFT
 
                 if (top == null || bottom == null) break;
 
-                var real = 1.0;
-                var imaginary = 0.0;
+                var real = 1.0f;
+                var imaginary = 0.0f;
 
                 // Perform butterflies
                 for (var butterfly = 0; butterfly < butterflyCount; butterfly++)
@@ -183,8 +183,8 @@ public sealed class FFT
 
     private class FFTElement
     {
-        public double Real;
-        public double Imaginary;
+        public float Real;
+        public float Imaginary;
         public FFTElement? Next;
         public int ReversePosition;
     }

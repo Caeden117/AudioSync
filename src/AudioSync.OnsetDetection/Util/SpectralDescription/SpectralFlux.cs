@@ -4,11 +4,11 @@ namespace AudioSync.OnsetDetection.Util.SpectralDescription;
 
 internal sealed class SpectralFlux : BaseSpectralDescription
 {
-    private readonly double[] oldMagnitude;
+    private readonly float[] oldMagnitude;
 
-    public SpectralFlux(int realSize) => oldMagnitude = new double[realSize];
+    public SpectralFlux(int realSize) => oldMagnitude = new float[realSize];
 
-    public override void Perform(in Span<Polar> fftGrain, ref double onset)
+    public override void Perform(in Span<Polar> fftGrain, ref float onset)
     {
         onset = default;
 

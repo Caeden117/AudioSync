@@ -1,20 +1,20 @@
 ﻿namespace AudioSync.Util.Tests.SpanQuickSort;
 
-[TestFixture(new double[] { 3, 2, 1 })]
-[TestFixture(new double[] { 1, 3, 3, 6, 7, 8, 9 })]
-[TestFixture(new double[] { 1, 2, 3, 4, 5, 6, 8, 9 })]
-[TestFixture(new double[] { 8, 14, 8, 45, 1, 31, 16, 40, 12, 30, 42, 30, 24 })]
-[TestFixture(new double[] { 4, 3, 7, 8, 4, 5, 12, 4, 5, 3, 2, 3 })]
-[TestFixture(new double[] { 1, 3, 4, 8, 12, 13, 15, 17, 19, 20 })]
-[TestFixture(new double[] { 31, 28, 19, 14, 11, 30, 27, 20 })]
-[TestFixture(new double[] { 4, 5, 8, 12, 15, 17, 18 })]
-[TestFixture(new double[] { 23, 26, 26, 26, 29, 36, 39, 40, 42, 42, 48, 49 })]
+[TestFixture(new float[] { 3, 2, 1 })]
+[TestFixture(new float[] { 1, 3, 3, 6, 7, 8, 9 })]
+[TestFixture(new float[] { 1, 2, 3, 4, 5, 6, 8, 9 })]
+[TestFixture(new float[] { 8, 14, 8, 45, 1, 31, 16, 40, 12, 30, 42, 30, 24 })]
+[TestFixture(new float[] { 4, 3, 7, 8, 4, 5, 12, 4, 5, 3, 2, 3 })]
+[TestFixture(new float[] { 1, 3, 4, 8, 12, 13, 15, 17, 19, 20 })]
+[TestFixture(new float[] { 31, 28, 19, 14, 11, 30, 27, 20 })]
+[TestFixture(new float[] { 4, 5, 8, 12, 15, 17, 18 })]
+[TestFixture(new float[] { 23, 26, 26, 26, 29, 36, 39, 40, 42, 42, 48, 49 })]
 // Manual test fixures with numbers that I typed as fast as I could.
 public class QuickSortTests
 {
-    private readonly double[] numbers;
+    private readonly float[] numbers;
 
-    public QuickSortTests(double[] numbers) => this.numbers = numbers;
+    public QuickSortTests(float[] numbers) => this.numbers = numbers;
 
     [Test]
     public void Sort()

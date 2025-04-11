@@ -10,13 +10,13 @@ public sealed class OnsetDetector
 {
     public int MinInterOnsetInterval { get; set; }
 
-    public double MinInterOnsetIntervalSeconds
+    public float MinInterOnsetIntervalSeconds
     {
-        get => MinInterOnsetInterval / (double)sampleRate;
+        get => MinInterOnsetInterval / (float)sampleRate;
         set => MinInterOnsetInterval = (int)Math.Round(value * sampleRate);
     }
 
-    public double MinInterOnsetIntervalMilliseconds
+    public float MinInterOnsetIntervalMilliseconds
     {
         get => MinInterOnsetIntervalSeconds * 1000;
         set => MinInterOnsetIntervalSeconds = value / 1000;
@@ -24,24 +24,24 @@ public sealed class OnsetDetector
 
     public int LastOffset => lastOnset - Delay;
 
-    public double SilenceThreshold { get; set; }
+    public float SilenceThreshold { get; set; }
 
     public int Delay { get; set; }
 
-    public double Threshold
+    public float Threshold
     {
         get => peakPicker.Threshold;
         set => peakPicker.Threshold = value;
     }
 
-    public double Compression
+    public float Compression
     {
-        get => applyCompression ? lambdaCompression : 0.0;
+        get => applyCompression ? lambdaCompression : 0.0f;
         set
         {
             if (value < 0.0) throw new ArgumentOutOfRangeException("Compression must be greater than or equal to 0.");
             lambdaCompression = value;
-            applyCompression = lambdaCompression > 0.0;
+            applyCompression = lambdaCompression > 0.0f;
         }
     }
 
@@ -57,11 +57,11 @@ public sealed class OnsetDetector
     private readonly int bufferSize;
     private readonly int realSize;
 
-    private double spectralOutput;
+    private float spectralOutput;
     private int totalFrames;
     private int lastOnset;
     private bool applyCompression;
-    private double lambdaCompression;
+    private float lambdaCompression;
 
     public OnsetDetector(OnsetType onsetType, int bufferSize, int hopSize, int sampleRate)
     {
@@ -75,39 +75,39 @@ public sealed class OnsetDetector
         phaseVocoder = new(bufferSize, realSize, hopSize);
         peakPicker = new();
         adaptiveWhitening = new(bufferSize, hopSize, sampleRate);
-        spectralOutput = 0.0;
+        spectralOutput = 0.0f;
 
         // Default values (before we re-initialize based on onset type)
-        Threshold = 0.3;
+        Threshold = 0.3f;
         Delay = (int)(4.3 * hopSize);
         MinInterOnsetIntervalMilliseconds = 50;
         SilenceThreshold = -70;
         ApplyWhitening = false;
-        Compression = 0.0;
+        Compression = 0.0f;
 
         // Change settings based on onset type
         switch (onsetType)
         {
             case OnsetType.HighFrequencyContent:
-                Threshold = 0.058;
+                Threshold = 0.058f;
                 Compression = 1;
                 spectralDescription = new HighFrequencyContent();
                 break;
             case OnsetType.ComplexDomain:
                 Delay = (int)(4.6 * hopSize);
-                Threshold = 0.15;
+                Threshold = 0.15f;
                 ApplyWhitening = true;
                 Compression = 1;
                 spectralDescription = new ComplexDomain(realSize);
                 break;
             case OnsetType.KullbackLiebler:
-                Threshold = 0.35;
+                Threshold = 0.35f;
                 ApplyWhitening = true;
-                Compression = 0.02;
+                Compression = 0.02f;
                 spectralDescription = new KullbackLiebler(realSize);
                 break;
             case OnsetType.SpectralFlux:
-                Threshold = 0.18;
+                Threshold = 0.18f;
                 ApplyWhitening = true;
                 adaptiveWhitening.RelaxTime = 100;
                 adaptiveWhitening.Floor = 1;
@@ -121,7 +121,7 @@ public sealed class OnsetDetector
         Reset();
     }
 
-    public void DetectOnsets(in Span<double> input, ref double onset)
+    public void DetectOnsets(in Span<float> input, ref float onset)
     {
         // Execute phase vocoding on our input.
         // It is possible to multi-thread this Phase Vocoder step by executing it before Onset Detection.
@@ -168,7 +168,7 @@ public sealed class OnsetDetector
             // Check if this onset far enough away and that it's not blocked by delay
             if (lastOnset + MinInterOnsetInterval >= newOnset || (lastOnset > 0 && Delay > newOnset))
             {
-                onset = 0.0;
+                onset = 0.0f;
                 return;
             }
 

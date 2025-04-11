@@ -4,8 +4,8 @@ namespace AudioSync.OnsetDetection.Util;
 
 internal abstract class Filter
 {
-    protected readonly double[] feedback;
-    protected readonly double[] forward;
+    protected readonly float[] feedback;
+    protected readonly float[] forward;
 
     private readonly int order;
 
@@ -15,19 +15,19 @@ internal abstract class Filter
 
         this.order = order;
 
-        feedback = new double[order];
-        forward = new double[order];
+        feedback = new float[order];
+        forward = new float[order];
 
         // Default to identity
-        feedback[0] = forward[0] = 1.0;
+        feedback[0] = forward[0] = 1.0f;
     }
 
-    public void ForwardFilter(ref Span<double> span)
+    public void ForwardFilter(ref Span<float> span)
     {
-        Span<double> x = stackalloc double[order];
+        Span<float> x = stackalloc float[order];
         x.Clear();
         
-        Span<double> y = stackalloc double[order];
+        Span<float> y = stackalloc float[order];
         y.Clear();
 
         for (var i = 0; i < span.Length; i++)
@@ -38,7 +38,7 @@ internal abstract class Filter
 
             // new input
             // "denormal" appears to be any value less than 0, so we'll just clamp to that
-            startX = Math.Max(input, 0.0);
+            startX = (float)Math.Max(input, 0.0);
             startY = forward[0] * startX;
 
             for (var j = 1; j < order; j++)
@@ -62,7 +62,7 @@ internal abstract class Filter
     /// <summary>
     /// Performs a double filter (forward and backward) over the input span, compensating for any phase shifts from a single filter.
     /// </summary>
-    public void DoubleFilter(ref Span<double> input)
+    public void DoubleFilter(ref Span<float> input)
     {
         // First filter, reversing our input afterwards in preparation for the second filter
         ForwardFilter(ref input);

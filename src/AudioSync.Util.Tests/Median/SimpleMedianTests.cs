@@ -6,17 +6,17 @@ public class SimpleMedianTests
     [Test]
     public void SimpleMedian()
     {
-        Span<double> span = stackalloc double[] { 1.0, 2.0, 3.0, 4.0, 5.0 };
+        Span<float> span = stackalloc float[] { 1.0f, 2.0f, 3.0f, 4.0f, 5.0f };
 
         var result = Utils.Median(ref span);
 
-        Assert.That(result, Is.EqualTo(3.0));
+        Assert.That(result, Is.EqualTo(3.0f));
     }
 
     [Test]
     public void SimpleMedianCompareAgainstAubio()
     { 
-        Span<double> span = stackalloc double[] { 1.0, 2.0, 3.0, 4.0, 5.0 };
+        Span<float> span = stackalloc float[] { 1.0f, 2.0f, 3.0f, 4.0f, 5.0f };
         double[] array = new double[] { 1.0, 2.0, 3.0, 4.0, 5.0 };
 
         var ourResult = Utils.Median(ref span);
@@ -30,7 +30,7 @@ public class SimpleMedianTests
     {
         Assert.Throws<AudioSyncFatalException>(() =>
         {
-            var arr = Array.Empty<double>();
+            var arr = Array.Empty<float>();
             var span = arr.AsSpan();
 
             var result = Utils.Median(ref span);

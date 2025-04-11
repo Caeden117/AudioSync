@@ -16,21 +16,21 @@ public sealed class SyncAnalyser
     private const int STRENGTH_WINDOW_SIZE = 200;
 
     // Fitness ratio of rounded to un-rounded required to accept a rounded BPM
-    private const double ROUNDING_THRESHOLD = 0.95;
+    private const float ROUNDING_THRESHOLD = 0.95f;
 
-    private readonly double minimumBPM;
-    private readonly double maximumBPM;
+    private readonly float minimumBPM;
+    private readonly float maximumBPM;
 
-    public SyncAnalyser(double minimumBPM = 85.0, double maximumBPM = 205.0)
+    public SyncAnalyser(float minimumBPM = 85, float maximumBPM = 205)
     {
         this.minimumBPM = minimumBPM;
         this.maximumBPM = maximumBPM;
     }
 
-    public Task<IList<SyncResult>> RunAsync(double[] monoAudioData, int sampleRate, int blockSize = 2048, int hopSize = 256)
+    public Task<IList<SyncResult>> RunAsync(float[] monoAudioData, int sampleRate, int blockSize = 2048, int hopSize = 256)
         => Task.Run(() => Run(monoAudioData, sampleRate, blockSize, hopSize));
 
-    public IList<SyncResult> Run(double[] monoAudioData, int sampleRate, int blockSize = 2048, int hopSize = 256)
+    public IList<SyncResult> Run(float[] monoAudioData, int sampleRate, int blockSize = 2048, int hopSize = 256)
     {
         // From mattmora's testing, Complex Domain with 0.1 threshold seems to give best results
         var onsetDetection = new OnsetDetector(OnsetType.ComplexDomain, blockSize, hopSize, sampleRate)
@@ -38,10 +38,10 @@ public sealed class SyncAnalyser
             Threshold = 0.1f
         };
 
-        Span<double> monoSpan = monoAudioData.AsSpan();
-        Span<double> hopData = stackalloc double[hopSize];
+        Span<float> monoSpan = monoAudioData.AsSpan();
+        Span<float> hopData = stackalloc float[hopSize];
         var samples = monoAudioData.Length;
-        var onsetOutput = 0.0;
+        var onsetOutput = 0.0f;
         var detectedOnsets = new List<Onset>();
 
         // Find onsets
@@ -64,7 +64,7 @@ public sealed class SyncAnalyser
             var windowMin = Math.Max(0, position - (STRENGTH_WINDOW_SIZE / 2));
             var windowMax = Math.Min(monoAudioData.Length, position + (STRENGTH_WINDOW_SIZE / 2));
 
-            var strength = 0.0;
+            var strength = 0.0f;
             for (var j = windowMin; j < windowMax; j++)
             {
                 strength += Math.Abs(monoAudioData[j]);
@@ -131,7 +131,7 @@ public sealed class SyncAnalyser
         var maxFitness = 0.001;
         for (var i = 0; i < numIntervals; i += INTERVAL_DELTA)
         {
-            fitness[i] -= poly.Evaluate(i + minInterval);
+            fitness[i] -= (float)poly.Evaluate(i + minInterval);
             maxFitness = Math.Max(maxFitness, fitness[i]);
         }
 
@@ -145,7 +145,7 @@ public sealed class SyncAnalyser
             var resultFitness = fitness[i];
 
             // Offset to be calculated later
-            results.Add(new SyncResult(resultFitness, resultBPM, 0.0));
+            results.Add(new SyncResult(resultFitness, resultBPM, 0.0f));
         }
 
         // Stop downsampling for more precision
@@ -198,7 +198,7 @@ public sealed class SyncAnalyser
             var result = results[i];
 
             // Calculate the difference between our BPM and a theoretical rounded BPM
-            var roundedBPM = Math.Round(result.BPM);
+            var roundedBPM = (float)Math.Round(result.BPM);
             var diff = Math.Abs(roundedBPM - result.BPM);
 
             // Ignore this result if the difference proves too much to bother
@@ -254,11 +254,11 @@ public sealed class SyncAnalyser
     #endregion
 
     // Calculates the best offsets for each BPM candidate.
-    private void CalculateOffset(List<Onset> onsets, IList<SyncResult> results, double[] monoSamples, int sampleRate)
+    private void CalculateOffset(List<Onset> onsets, IList<SyncResult> results, float[] monoSamples, int sampleRate)
     {
         // Create gapdata buffers for testing.
-        var maxInterval = 0.0;
-        foreach (var result in results) maxInterval = Math.Max(maxInterval, sampleRate * 60.0 / result.BPM);
+        var maxInterval = 0.0f;
+        foreach (var result in results) maxInterval = (float)Math.Max(maxInterval, sampleRate * 60.0 / result.BPM);
         var gapData = new GapData((int)(maxInterval + 1.0), 1, onsets);
 
         for (var i = 0; i < results.Count; i++)
@@ -280,7 +280,7 @@ public sealed class SyncAnalyser
     }
 
     // Compares each offset to its corresponding offbeat value, and selects the most promising one.
-    private double AdjustForOffbeats(double[] monoSamples, int sampleRate, double offset, double bpm)
+    private float AdjustForOffbeats(float[] monoSamples, int sampleRate, float offset, float bpm)
     {
         var sampleCount = monoSamples.Length;
 
@@ -288,14 +288,14 @@ public sealed class SyncAnalyser
         // REVIEW: Stackallocing with the entire length of mono samples will almost assuredly overflow the stack.
         //   However, I don't want to allocate garbage with every invocation.
         //   Should I switch to ArrayPool?
-        var slopesArr = new double[sampleCount];
+        var slopesArr = new float[sampleCount];
         var slopes = slopesArr.AsSpan();
         //Span<double> slopes = stackalloc double[sampleCount];
         ComputeSlopes(monoSamples, ref slopes, sampleCount, sampleRate);
 
         // Determine the offbeat sample position.
-        var secondsPerBeat = 60.0 / bpm;
-        var offbeat = offset + (secondsPerBeat * 0.5);
+        var secondsPerBeat = 60.0f / bpm;
+        var offbeat = offset + (secondsPerBeat * 0.5f);
         if (offbeat > secondsPerBeat) offbeat -= secondsPerBeat;
 
         // Calculate the support for both sample positions.
@@ -303,8 +303,8 @@ public sealed class SyncAnalyser
         var interval = secondsPerBeat * sampleRate;
         var posA = offset * sampleRate;
         var posB = offbeat * sampleRate;
-        var sumA = 0.0;
-        var sumB = 0.0;
+        var sumA = 0.0f;
+        var sumB = 0.0f;
 
         while (posA < sampleCount && posB < sampleCount)
         {
@@ -320,14 +320,14 @@ public sealed class SyncAnalyser
     }
 
     // Compute slopes/derivatives of our samples
-    private void ComputeSlopes(double[] samples, ref Span<double> output, int numFrames, int samplerate)
+    private void ComputeSlopes(float[] samples, ref Span<float> output, int numFrames, int samplerate)
     {
         var wh = samplerate / 20;
         if (numFrames < wh * 2) return;
 
         // Initial sums of the left/right side of the window.
-        var sumL = 0.0;
-        var sumR = 0.0;
+        var sumL = 0.0f;
+        var sumR = 0.0f;
         for (var i = 0; i < wh; i++)
         {
             sumL += Math.Abs(samples[i]);
@@ -335,11 +335,11 @@ public sealed class SyncAnalyser
         }
 
         // Slide window over the samples.
-        var scalar = 1.0 / wh;
+        var scalar = 1.0f / wh;
         for (int i = wh; i < numFrames - wh; i++)
         {
             // Determine slope value.
-            output[i] = Math.Max(0.0, (sumR - sumL) * scalar);
+            output[i] = Math.Max(0.0f, (sumR - sumL) * scalar);
 
             // Slide window over.
             var cur = Math.Abs(samples[i]);

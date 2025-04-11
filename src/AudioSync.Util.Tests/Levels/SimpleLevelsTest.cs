@@ -2,13 +2,13 @@
 
 public class SimpleLevelsTest
 {
-    private const double silenceThreshold = -79.9;
+    private const float silenceThreshold = -79.9f;
 
     [Test]
     public void CompleteSilenceIsSilent()
     {
         // 0.0 for each sample, representing completely silent audio.
-        Span<double> silence = stackalloc double[100];
+        Span<float> silence = stackalloc float[100];
         silence.Clear();
 
         var isSilence = Utils.IsSilence(in silence, silenceThreshold);
@@ -20,7 +20,7 @@ public class SimpleLevelsTest
     public void CompleteSilenceIs80Decibles()
     {
         // 0.0 for each sample, representing completely silent audio.
-        Span<double> silence = stackalloc double[100];
+        Span<float> silence = stackalloc float[100];
         silence.Clear();
 
         var soundPressure = Utils.DBSoundPressureLevel(in silence);
@@ -32,7 +32,7 @@ public class SimpleLevelsTest
     public void CompleteSilenceHas0Level()
     {
         // 0.0 for each sample, representing completely silent audio.
-        Span<double> silence = stackalloc double[100];
+        Span<float> silence = stackalloc float[100];
         silence.Clear();
 
         var level = Utils.LevelLinear(in silence);
@@ -44,8 +44,8 @@ public class SimpleLevelsTest
     public void LoudIsNotSilent()
     {
         // 1.0 for each sample, representing L O U D audio.
-        Span<double> loud = stackalloc double[100];
-        loud.Fill(1.0);
+        Span<float> loud = stackalloc float[100];
+        loud.Fill(1.0f);
 
         var isSilence = Utils.IsSilence(in loud, silenceThreshold);
 
@@ -56,8 +56,8 @@ public class SimpleLevelsTest
     public void LoudIs0Decibles()
     {
         // 1.0 for each sample, representing L O U D audio.
-        Span<double> loud = stackalloc double[100];
-        loud.Fill(1.0);
+        Span<float> loud = stackalloc float[100];
+        loud.Fill(1.0f);
 
         var soundPressure = Utils.DBSoundPressureLevel(in loud);
 
@@ -68,8 +68,8 @@ public class SimpleLevelsTest
     public void LoudLevelIsEqualToOne()
     {
         // 1.0 for each sample, representing L O U D audio.
-        Span<double> loud = stackalloc double[100];
-        loud.Fill(1.0);
+        Span<float> loud = stackalloc float[100];
+        loud.Fill(1.0f);
 
         var level = Utils.LevelLinear(in loud);
 

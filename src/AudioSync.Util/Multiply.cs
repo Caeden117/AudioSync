@@ -8,7 +8,7 @@ public static partial class Utils
     /// <summary>
     /// Multiplies span <paramref name="a"/> and <paramref name="b"/> into span <paramref name="result"/>.
     /// </summary>
-    public static void Multiply(in Span<double> a, in Span<double> b, ref Span<double> result)
+    public static void Multiply(in Span<float> a, in Span<float> b, ref Span<float> result)
     {
         if (a.Length != b.Length) throw new AudioSyncFatalException($"Lengths of {nameof(a)} and {nameof(b)} are not equal.");
         if (a.Length != result.Length) throw new AudioSyncFatalException($"Length of {nameof(result)} must match the length of the input parameters.");
@@ -25,14 +25,14 @@ public static partial class Utils
     /// <remarks>
     /// Accelerated by SIMD (Same Instruction, Multiple Data). Not supported on all architectures.
     /// </remarks>
-    public static void MultiplySIMD(in Span<double> a, in Span<double> b, ref Span<double> result)
+    public static void MultiplySIMD(in Span<float> a, in Span<float> b, ref Span<float> result)
     {
         if (a.Length != b.Length) throw new AudioSyncFatalException($"Lengths of {nameof(a)} and {nameof(b)} are not equal.");
         if (a.Length != result.Length) throw new AudioSyncFatalException($"Length of {nameof(result)} must match the length of the input parameters.");
 
         // Variables we will use throughout the method
         var length = a.Length;
-        var vectorCount = Vector<double>.Count;
+        var vectorCount = Vector<float>.Count;
         var remaining = length % vectorCount;
 
         // Perform SIMD-accelerated multiplication on as many groups of numbers as we can
@@ -41,8 +41,8 @@ public static partial class Utils
             var sliceA = a.Slice(i, vectorCount);
             var sliceB = b.Slice(i, vectorCount);
 
-            var vectorA = new Vector<double>(sliceA);
-            var vectorB = new Vector<double>(sliceB);
+            var vectorA = new Vector<float>(sliceA);
+            var vectorB = new Vector<float>(sliceB);
             var vectorResult = vectorA * vectorB;
 
 #if NETCOREAPP3_0_OR_GREATER

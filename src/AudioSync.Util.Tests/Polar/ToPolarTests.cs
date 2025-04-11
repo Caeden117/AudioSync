@@ -36,8 +36,8 @@ public class ToPolarTests
     
         for (var i = 0; i < N; i++)
         {
-            Assert.That(polars[i].Norm, Is.EqualTo(complexSpans[i].Magnitude));
-            Assert.That(polars[i].Phase, Is.EqualTo(complexSpans[i].Phase));
+            Assert.That(polars[i].Norm, Is.EqualTo(complexSpans[i].Magnitude).Within(0.00001));
+            Assert.That(polars[i].Phase, Is.EqualTo(complexSpans[i].Phase).Within(0.00001));
         }
     }
 }

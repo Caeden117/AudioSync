@@ -1,11 +1,11 @@
 ﻿namespace AudioSync.Util.Tests.Swap;
 
 // Test with explicitly given array
-[TestFixture(new double[] { 1, 2 })]
-[TestFixture(new double[] { 1, 2, 3 })]
-[TestFixture(new double[] { 1, 2, 3, 4 })]
-[TestFixture(new double[] { 1, 2, 3, 4, 5 })]
-[TestFixture(new double[] { 55.1, 234.5, 123.1, 204.2, 1, 283, 99.1 })]
+[TestFixture(new float[] { 1, 2 })]
+[TestFixture(new float[] { 1, 2, 3 })]
+[TestFixture(new float[] { 1, 2, 3, 4 })]
+[TestFixture(new float[] { 1, 2, 3, 4, 5 })]
+[TestFixture(new float[] { 55.1f, 234.5f, 123.1f, 204.2f, 1, 283, 99.1f })]
 // Test with elements of N size, filled with RNG values
 [TestFixture(10)]
 [TestFixture(100)]
@@ -17,13 +17,13 @@
 [TestFixture(1023)]
 public class SwapTests
 {
-    private readonly double[] numbers;
+    private readonly float[] numbers;
 
-    public SwapTests(double[] numbers) => this.numbers = numbers;
+    public SwapTests(float[] numbers) => this.numbers = numbers;
 
     public SwapTests(int n)
     {
-        numbers = new double[n];
+        numbers = new float[n];
 
         // Fill with RNG data
         var rng = new Random();
@@ -40,7 +40,7 @@ public class SwapTests
         var span = numbers.AsSpan();
         
         // Set up a copy of our data for evaluation
-        Span<double> copySpan = stackalloc double[span.Length];
+        Span<float> copySpan = stackalloc float[span.Length];
         span.CopyTo(copySpan);
 
         Utils.Swap(ref span);
@@ -62,7 +62,7 @@ public class SwapTests
         var span = numbers.AsSpan();
 
         // Set up a copy of our data for evaluation
-        double[] copyArr = new double[numbers.Length];
+        float[] copyArr = new float[numbers.Length];
         Array.Copy(numbers, copyArr, numbers.Length);
 
         // Swap twice. This should retain the original order.

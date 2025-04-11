@@ -5,7 +5,7 @@ public static partial class Utils
     /// <summary>
     /// Simple peak index algorithm.
     /// </summary>
-    public static bool PeakPick(in Span<double> onset, int position)
+    public static bool PeakPick(in Span<float> onset, int position)
     {
         if (position <= 0 || position >= onset.Length - 1) throw new ArgumentOutOfRangeException(nameof(position));
 
@@ -17,7 +17,7 @@ public static partial class Utils
     /// <summary>
     /// Use quadratic interpolation to find the exact peak index
     /// </summary>
-    public static double QuadraticPeakPos(in Span<double> onset, int position)
+    public static float QuadraticPeakPos(in Span<float> onset, int position)
     {
         if (position == 0 || position == onset.Length - 1) return position;
 
@@ -32,6 +32,6 @@ public static partial class Utils
         var s1 = onset[position];
         var s2 = onset[x2];
 
-        return position + (0.5 * (s0 - s2) / (s0 - (2 * s1) + s2));
+        return position + (0.5f * (s0 - s2) / (s0 - (2 * s1) + s2));
     }
 }

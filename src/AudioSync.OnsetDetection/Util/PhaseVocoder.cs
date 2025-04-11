@@ -10,7 +10,7 @@ internal sealed class PhaseVocoder
     private readonly int hopSize;
     private readonly int realSize;
     private readonly FFT fft;
-    private readonly double[] hannWindow;
+    private readonly float[] hannWindow;
     private readonly int end;
 
     public PhaseVocoder(int windowSize, int realSize, int hopSize)
@@ -20,17 +20,17 @@ internal sealed class PhaseVocoder
         this.realSize = realSize;
 
         // Generate a Hann coefficient window
-        hannWindow = SineExpansion(windowSize, 0.5, -0.5);
+        hannWindow = SineExpansion(windowSize, 0.5f, -0.5f);
 
         end = windowSize > hopSize
             ? windowSize - hopSize
             : 0;
     }
 
-    public void Process(in Span<double> dataNew, ref Span<Polar> allocatedOutput)
+    public void Process(in Span<float> dataNew, ref Span<Polar> allocatedOutput)
     {
         // Create working data that matches the size of our Hann window
-        Span<double> dataSpan = stackalloc double[hannWindow.Length];
+        Span<float> dataSpan = stackalloc float[hannWindow.Length];
         dataNew.CopyTo(dataSpan);
 
         var windowSpan = hannWindow.AsSpan();
@@ -49,19 +49,19 @@ internal sealed class PhaseVocoder
         for (var i = 0; i < realSize; i++)
         {
             var complexItem = fftData[i];
-            allocatedOutput[i] = new Polar(complexItem.Magnitude, complexItem.Phase);
+            allocatedOutput[i] = new Polar((float)complexItem.Magnitude, (float)complexItem.Phase);
         }
     }
 
-    private double[] SineExpansion(int points, params double[] coefficients)
+    private float[] SineExpansion(int points, params float[] coefficients)
     {
-        Span<double> z = stackalloc double[points];
+        Span<float> z = stackalloc float[points];
         for (var i = 0; i < points; i++)
         {
-            z[i] = 2.0 * Math.PI * i / points;
+            z[i] = 2.0f * (float)Math.PI * i / points;
         }
 
-        var window = new double[points];
+        var window = new float[points];
 
         for (var i = 0; i < points; i++)
         {
@@ -69,7 +69,7 @@ internal sealed class PhaseVocoder
             
             for (var j = 1; j < coefficients.Length; j++)
             {
-                coefficient += coefficients[j] * Math.Cos(j * z[i]);
+                coefficient += coefficients[j] * (float)Math.Cos(j * z[i]);
             }
 
             window[i] = coefficient;

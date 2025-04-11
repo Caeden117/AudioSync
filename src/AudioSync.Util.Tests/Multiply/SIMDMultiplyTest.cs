@@ -16,15 +16,15 @@
 [TestFixture(2048)]
 public class SIMDMultiplyTest
 {
-    private readonly double[] numbers;
-    private readonly double[] multiplyBy;
-    private readonly double[] results;
+    private readonly float[] numbers;
+    private readonly float[] multiplyBy;
+    private readonly float[] results;
 
     public SIMDMultiplyTest(int n)
     {
-        numbers = new double[n];
-        multiplyBy = new double[n];
-        results = new double[n];
+        numbers = new float[n];
+        multiplyBy = new float[n];
+        results = new float[n];
 
         var rng = new Random();
 

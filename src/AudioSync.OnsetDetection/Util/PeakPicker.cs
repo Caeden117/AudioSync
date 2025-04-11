@@ -4,36 +4,36 @@ namespace AudioSync.OnsetDetection.Util;
 
 internal sealed class PeakPicker
 {
-    public double Threshold { get; set; }
+    public float Threshold { get; set; }
 
-    public double Thresholded { get; set; }
+    public float Thresholded { get; set; }
 
     private readonly int windowPost;
     private readonly int windowPre;
     private readonly BiquadFilter biquadFilter;
-    private readonly double[] window;
-    private readonly double[] onsetPeek;
+    private readonly float[] window;
+    private readonly float[] onsetPeek;
 
     public PeakPicker()
     {
-        Threshold = 0.1;
+        Threshold = 0.1f;
         windowPost = 5;
         windowPre = 1;
 
-        window = new double[windowPost + windowPre + 1];
-        onsetPeek = new double[3];
+        window = new float[windowPost + windowPre + 1];
+        onsetPeek = new float[3];
 
-        biquadFilter = new(0.15998789, 0.31997577, 0.15998789, 0.23484048, 0);
+        biquadFilter = new(0.15998789f, 0.31997577f, 0.15998789f, 0.23484048f, 0);
     }
 
-    public void FindPeak(in double onset, ref double lastOnset)
+    public void FindPeak(in float onset, ref float lastOnset)
     {
         // Push first onset into our window
-        Span<double> windowSpan = window.AsSpan();
+        Span<float> windowSpan = window.AsSpan();
         Utils.Push(ref windowSpan, onset);
 
         // Stackalloc a copy of our window to perform work with
-        Span<double> modifiedSpan = stackalloc double[windowSpan.Length];
+        Span<float> modifiedSpan = stackalloc float[windowSpan.Length];
         windowSpan.CopyTo(modifiedSpan);
 
         // Perform double biquad filtering on our working set
@@ -41,7 +41,7 @@ internal sealed class PeakPicker
 
         // Manually calculate average of our modified span
         // (this span will never be large enough to see improvements from the likes of SIMD)
-        var acc = 0.0;
+        var acc = 0.0f;
         for (var i = 0; i < modifiedSpan.Length; i++)
         {
             acc += modifiedSpan[i];

@@ -10,9 +10,9 @@ public static partial class Utils
     /// <remarks>
     /// This method stack allocates a copy of <paramref name="span"/> to perform work, so the original <paramref name="span"/> is not modified.
     /// </remarks>
-    public static double SafeMedian(in Span<double> span)
+    public static float SafeMedian(in Span<float> span)
     {
-        Span<double> work = stackalloc double[span.Length];
+        Span<float> work = stackalloc float[span.Length];
         span.CopyTo(work);
 
         return Median(ref work);
@@ -24,7 +24,7 @@ public static partial class Utils
     /// <remarks>
     /// This method manipulates and sorts the source <paramref name="span"/>.
     /// </remarks>
-    public static double Median(ref Span<double> span)
+    public static float Median(ref Span<float> span)
     {
         if (span.Length <= 0) throw new AudioSyncFatalException($"{nameof(span)} must have items to take the median of.");
         
