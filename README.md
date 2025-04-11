@@ -45,11 +45,11 @@ audioClip.GetData(samples, 0);
 
 ### Run Sync Analysis
 
-Using AudioSync, convert your samples to a mono-channel `double[]` and run through the library.
+Convert your samples to a mono-channel `float[]` (AudioSync provides utilities to do this) and run through sync analysis.
 
 ```cs
 
-// AudioSync contains helper methods to automatically compress and convert your samples to a mono-channel double[]
+// AudioSync contains helper methods to automatically compress and convert your samples to a mono-channel float[]
 var monoSamples = samples.ConvertToMonoSamples(channel);
 
 var syncAnalysis = new SyncAnalyser();
@@ -63,7 +63,6 @@ var results = await SyncAnalysis.RunAsync(monoSamples, sampleRate);
 
 ## TODO
 
-- Add overload for `float[]` parameters (seems Unity and NAudio all use `float[]` for storing samples)
 - Build out tests to cover `AudioSync.OnsetDetection` and `AudioSync` projects
 - Publish to NuGet
 
