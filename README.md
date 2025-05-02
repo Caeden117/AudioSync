@@ -13,6 +13,7 @@ In your game engine or audio processing library, obtain an array containing audi
 ```cs
 using NAudio.Wave;
 
+// Obtain a reference to your audio file somewhere
 using var reader = new AudioFileReader("song.mp3");
 
 var channels = reader.WaveFormat.Channels;
@@ -37,7 +38,7 @@ AudioClip audioClip;
 
 var channels = audioClip.channels;
 var sampleRate = audioClip.frequency;
-var sampleLength = Mathf.CeilToInt(audioClip.length * audioClip.frequency);
+var sampleLength = audioClip.samples;
 
 var samples = new float[sampleLength];
 audioClip.GetData(samples, 0);
@@ -50,7 +51,7 @@ Convert your samples to a mono-channel `float[]` (AudioSync provides utilities t
 ```cs
 
 // AudioSync contains helper methods to automatically compress and convert your samples to a mono-channel float[]
-var monoSamples = samples.ConvertToMonoSamples(channel);
+var monoSamples = samples.ConvertToMonoSamples(channels);
 
 var syncAnalysis = new SyncAnalyser();
 
