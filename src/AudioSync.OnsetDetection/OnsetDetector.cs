@@ -127,6 +127,7 @@ public sealed class OnsetDetector
         // It is possible to multi-thread this Phase Vocoder step by executing it before Onset Detection.
         // In my personal testing, it seems to save about 0.3 seconds, *but* requires more than double the memory.
         Span<Polar> fftGrain = stackalloc Polar[realSize];
+        fftGrain.Clear();
         phaseVocoder.Process(in input, ref fftGrain);
 
         // Apply whitening if enabled

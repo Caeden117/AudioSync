@@ -31,6 +31,7 @@ internal sealed class PhaseVocoder
     {
         // Create working data that matches the size of our Hann window
         Span<float> dataSpan = stackalloc float[hannWindow.Length];
+        dataSpan.Clear();
         dataNew.CopyTo(dataSpan);
 
         var windowSpan = hannWindow.AsSpan();
@@ -43,6 +44,7 @@ internal sealed class PhaseVocoder
 
         // Perform FFT
         Span<Complex> fftData = stackalloc Complex[realSize];
+        fftData.Clear();
         fft.Execute(in dataSpan, ref fftData);
 
         // Manually convert to Polar coordinates to get around some weird C# problems
