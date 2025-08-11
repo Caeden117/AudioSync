@@ -65,10 +65,11 @@ public sealed class SyncAnalyser
             var windowMax = Math.Min(monoAudioData.Length, position + (STRENGTH_WINDOW_SIZE / 2));
 
             var strength = 0.0f;
-            for (var j = windowMin; j < windowMax; j++)
+            Parallel.For(windowMin, windowMax, j =>
             {
-                strength += MathF.Abs(monoAudioData[j]);
-            }
+                Interlocked.Exchange(ref strength, strength + MathF.Abs(monoAudioData[j]));
+            });
+
             strength /= MathF.Max(1, windowMax - windowMin);
 
             detectedOnsets.Add(new(onsetDetection.LastOffset, strength));
