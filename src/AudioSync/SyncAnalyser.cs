@@ -11,6 +11,8 @@ public sealed class SyncAnalyser
     private const int INTERVAL_DELTA = 1;
     private const int INTERVAL_DOWNSAMPLE = 5;
 
+    private const int NUM_THREADS = 8;
+
     // Size of window around onset sample used to calculate onset strength, can significantly affect results
     // 200 is from the original code, not sure where it comes from, but it seems to work well
     private const int STRENGTH_WINDOW_SIZE = 200;
@@ -41,11 +43,49 @@ public sealed class SyncAnalyser
         Span<float> monoSpan = monoAudioData.AsSpan();
         Span<float> hopData = stackalloc float[hopSize];
         var samples = monoAudioData.Length;
-        var onsetOutput = 0.0f;
         var detectedOnsets = new List<Onset>();
 
+        // Perform onset detection in chunks across multiple threads
+        // Technically it *does* lose accuracy on thread boundaries but the speed increase is worth it
+        Parallel.For(0, NUM_THREADS, thread =>
+        {
+            var samplesPerThread = samples / NUM_THREADS;
+            var startThread = thread * samplesPerThread;
+            var endThread = (thread + 1) * samplesPerThread;
+
+            FindOnsetThreaded(startThread, endThread, detectedOnsets, monoAudioData, blockSize, hopSize, sampleRate);
+        });
+
+        // We need at least two onsets to determine BPM, return empty.
+        if (detectedOnsets.Count < 2)
+        {
+            return Array.Empty<SyncResult>();
+        }
+
+        // Calculate BPM using our detected onsets
+        var syncResults = CalculateBPM(detectedOnsets, sampleRate);
+
+        // Further calculate offset for our sync results
+        CalculateOffset(detectedOnsets, syncResults, monoAudioData, sampleRate);
+
+        // bingo.
+        return syncResults;
+    }
+
+    private void FindOnsetThreaded(int frameStart, int frameEnd, List<Onset> detectedOnsets, float[] monoAudioData, int blockSize, int hopSize, int sampleRate)
+    {
+        // From mattmora's testing, Complex Domain with 0.1 threshold seems to give best results
+        var onsetDetection = new OnsetDetector(OnsetType.ComplexDomain, blockSize, hopSize, sampleRate)
+        {
+            Threshold = 0.1f
+        };
+
+        Span<float> monoSpan = monoAudioData.AsSpan();
+        Span<float> hopData = stackalloc float[hopSize];
+        var onsetOutput = 0.0f;
+
         // Find onsets
-        for (var i = 0; i + hopSize < samples; i += hopSize)
+        for (var i = frameStart; i + hopSize < frameEnd; i += hopSize)
         {
             // We copy blocks at a time to save iterations 
             monoSpan.Slice(i, hopSize).CopyTo(hopData);
@@ -69,26 +109,10 @@ public sealed class SyncAnalyser
             {
                 Interlocked.Exchange(ref strength, strength + MathF.Abs(monoAudioData[j]));
             });
-
             strength /= MathF.Max(1, windowMax - windowMin);
 
             detectedOnsets.Add(new(onsetDetection.LastOffset, strength));
         }
-
-        // We need at least two onsets to determine BPM, return empty.
-        if (detectedOnsets.Count < 2)
-        {
-            return Array.Empty<SyncResult>();
-        }
-
-        // Calculate BPM using our detected onsets
-        var syncResults = CalculateBPM(detectedOnsets, sampleRate);
-
-        // Further calculate offset for our sync results
-        CalculateOffset(detectedOnsets, syncResults, monoAudioData, sampleRate);
-
-        // bingo.
-        return syncResults;
     }
 
     #region BPM Calculation
