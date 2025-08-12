@@ -11,7 +11,13 @@ public sealed class SyncAnalyser
     private const int INTERVAL_DELTA = 1;
     private const int INTERVAL_DOWNSAMPLE = 5;
 
+    // Number of threads to use for parallel onset detection.
+    // More is better, but diminishing returns after a certain point.
+    // (Too many threads can also reduce onset accuracy)
     private const int NUM_THREADS = 8;
+
+    // Max number of results to return.
+    private const int MAX_RESULTS = 10;
 
     // Size of window around onset sample used to calculate onset strength, can significantly affect results
     // 200 is from the original code, not sure where it comes from, but it seems to work well
@@ -68,6 +74,9 @@ public sealed class SyncAnalyser
         // Further calculate offset for our sync results
         CalculateOffset(detectedOnsets, syncResults, monoAudioData, sampleRate);
 
+        // Limit results to max results allowed
+        syncResults.Capacity = Math.Min(syncResults.Count, MAX_RESULTS);
+
         // bingo.
         return syncResults;
     }
@@ -116,7 +125,7 @@ public sealed class SyncAnalyser
     }
 
     #region BPM Calculation
-    private IList<SyncResult> CalculateBPM(List<Onset> onsets, int sampleRate)
+    private List<SyncResult> CalculateBPM(List<Onset> onsets, int sampleRate)
     {
         var results = new List<SyncResult>();
 
