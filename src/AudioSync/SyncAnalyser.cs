@@ -75,7 +75,8 @@ public sealed class SyncAnalyser
         CalculateOffset(detectedOnsets, syncResults, monoAudioData, sampleRate);
 
         // Limit results to max results allowed
-        syncResults.Capacity = Math.Min(syncResults.Count, MAX_RESULTS);
+        if (syncResults.Count > MAX_RESULTS)
+            syncResults.RemoveRange(MAX_RESULTS, syncResults.Count - MAX_RESULTS);
 
         // bingo.
         return syncResults;
